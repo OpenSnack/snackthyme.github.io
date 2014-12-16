@@ -1,0 +1,53 @@
+.navbar {
+	position: fixed;
+	background-color: white;
+	width: 100%;
+	top: 0px;
+	left: 0px;
+}
+
+.navbar ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+.navbar li#homebar {
+	display: inline-block;
+	background-color: #9afeff;
+	margin-right: -4px;
+}
+
+.navbar li#homebar:hover {
+	background-color: #7dfdfe;
+}
+
+.navbar li#aboutbar {
+	display: inline-block;
+	background-color: #50ebec;
+	margin-right: -4px;
+}
+
+.navbar li#aboutbar:hover {
+	background-color: #4ee2ec;
+}
+
+.navbar li#blogbar {
+	display: inline-block;
+	background-color: #5cb3ff;
+	margin-right: -4px;
+}
+
+.navbar li#blogbar:hover {
+	background-color: #38acec;
+}
+
+.navbar a {
+	color: #FFFFFF;
+	text-decoration: none;
+	display: block;
+	text-align: center;
+	width: 80px;
+	padding: 10px;
+}
