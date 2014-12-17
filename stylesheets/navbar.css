@@ -1,9 +1,11 @@
 .navbar {
 	position: fixed;
 	background-color: white;
+	opacity: 0.6;
 	width: 100%;
 	top: 0px;
 	left: 0px;
+	box-shadow: 0px 2px 10px black;
 }
 
 .navbar ul {
@@ -15,36 +17,42 @@
 
 .navbar li#homebar {
 	display: inline-block;
-	background-color: #9afeff;
 	margin-right: -4px;
+	box-shadow: -6px 0 white, 6px 0 white, 0 6px 4px -2px #CCCCCC;
 }
 
 .navbar li#homebar:hover {
-	background-color: #7dfdfe;
 }
 
 .navbar li#aboutbar {
 	display: inline-block;
-	background-color: #50ebec;
 	margin-right: -4px;
+	box-shadow: -6px 0 white, 6px 0 white, 0 6px 4px -2px #22316C;
 }
 
 .navbar li#aboutbar:hover {
-	background-color: #4ee2ec;
+}
+
+.navbar li#findmebar {
+	display: inline-block;
+	margin-right: -4px;
+	box-shadow: -6px 0 white, 6px 0 white, 0 6px 4px -2px #33B5E5;
+}
+
+.navbar li#findmebar:hover {
 }
 
 .navbar li#blogbar {
 	display: inline-block;
-	background-color: #5cb3ff;
 	margin-right: -4px;
+	box-shadow: -6px 0 white, 6px 0 white, 0 6px 4px -2px #CCCCCC;
 }
 
 .navbar li#blogbar:hover {
-	background-color: #38acec;
 }
 
 .navbar a {
-	color: #FFFFFF;
+	color: black;
 	text-decoration: none;
 	display: block;
 	text-align: center;
