@@ -1,3 +1,7 @@
+h1, h3, p {
+	font-weight: 400;
+}
+
 .welcome {
 	position: relative;
 	background-color: #22316C;
@@ -11,7 +15,6 @@
 
 .welcome h1 {
 	display: inline;
-	font-weight: 400;
 	padding-left: 100px;
 	color: white;
 }
@@ -25,7 +28,6 @@
 /* post title */
 .post h1 {
 	margin-bottom: 10px;
-	font-weight: 400;
 }
 
 .post hr {
@@ -42,18 +44,15 @@
 .post p {
 	margin: 20px 0 100px 20px;
 	font-size: 125%;
-	font-weight: 400;
 }
 
 /* date */
 .post h3 {
 	font-size: 90%;
-	font-weight: 400;
 	color: #22316C;
 	margin: 20px 0 20px 20px;
 }
 
 .post h3::before {
-	font-weight: 400;
 	content: "+added ";
 }
