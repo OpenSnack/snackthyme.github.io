@@ -1,12 +1,47 @@
-.navbar {
-	position: fixed;
-	background-color: white;
-	opacity: 0.8;
-	width: 100%;
-	top: 0px;
-	left: 0px;
-	box-shadow: 0px 2px 10px black;
+@media only screen and (min-width: 1440px) {
+	.navbar {
+		position: fixed;
+		background-color: white;
+		opacity: 0.7;
+		width: 100%;
+		top: 0px;
+		left: 0px;
+		box-shadow: 0px 2px 10px black;
+	}
+
+	.navbar a {
+		color: black;
+		text-decoration: none;
+		display: block;
+		text-align: center;
+		width: 80px;
+		padding: 10px;
+	}
 }
+
+@media only screen and (max-width: 1080px) {
+	.navbar {
+		position: fixed;
+		background-color: white;
+		opacity: 0.7;
+		width: 100%;
+		top: 0px;
+		left: 0px;
+		box-shadow: 0px 5px 10px black;
+	}
+
+	.navbar a {
+		color: black;
+		text-decoration: none;
+		display: block;
+		text-align: center;
+		font-size: 300%;
+		width: 20vw;
+		padding: 30px 10px 30px 10px;
+	}
+}
+
+
 
 .navbar ul {
 	list-style-type: none;
@@ -49,13 +84,4 @@
 }
 
 .navbar li#blogbar:hover {
-}
-
-.navbar a {
-	color: black;
-	text-decoration: none;
-	display: block;
-	text-align: center;
-	width: 80px;
-	padding: 10px;
 }
