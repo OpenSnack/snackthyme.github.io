@@ -1,4 +1,4 @@
-@media only screen and (min-width: 1440px) {
+/*@media only screen and (orientation: landscape) {*/
 	.navbar {
 		position: fixed;
 		background-color: white;
@@ -17,9 +17,9 @@
 		width: 80px;
 		padding: 10px;
 	}
-}
+/*}*/
 
-@media only screen and (max-width: 1080px) {
+/*@media only screen and (orientation: portrait) {
 	.navbar {
 		position: fixed;
 		background-color: white;
@@ -39,9 +39,7 @@
 		width: 20vw;
 		padding: 30px 10px 30px 10px;
 	}
-}
-
-
+}*/
 
 .navbar ul {
 	list-style-type: none;

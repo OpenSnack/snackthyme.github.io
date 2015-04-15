@@ -2,7 +2,7 @@ h1, h2, h3 {
 	font-weight: 400;
 }
 
-@media only screen and (min-width: 1440px) {
+@media only screen and (orientation: landscape) {
 	.head {
 		position: relative;	
 		width: 100%;
@@ -135,7 +135,7 @@ h1, h2, h3 {
 	}
 }
 
-@media only screen and (max-width: 1080px) {
+@media only screen and (orientation: portrait) {
 	body {
 		text-align: center;
 		margin: 0;
