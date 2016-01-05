@@ -85,6 +85,10 @@ h1, h2, h3 {
 		padding-left: 100px;
 	}
 
+	.stuff_content_left ul a {
+		color: white;
+	}
+
 	.stuff_content_right {
 		display: table-cell;
 		font-size: 150%;
