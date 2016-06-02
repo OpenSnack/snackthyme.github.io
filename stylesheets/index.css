@@ -4,7 +4,7 @@ h1, h2, h3 {
 
 @media only screen and (orientation: landscape) {
 	.head {
-		position: relative;	
+		position: relative;
 		width: 100%;
 		height: 500px;
 		margin: -8px;
@@ -29,7 +29,7 @@ h1, h2, h3 {
 		width: 90%;
 	}
 
-	.socialrow a {
+	.socialrow div {
 		display: table-cell;
 		margin: 0;
 		text-align: center;
@@ -146,7 +146,7 @@ h1, h2, h3 {
 	}
 
 	.head {
-		position: relative;	
+		position: relative;
 		width: 100%;
 		height: 100vh;
 		margin-left: auto;
