@@ -3,17 +3,28 @@
     <head>
         <meta charset="utf-8" />
         <title>D3 Audio Visualizer</title>
-        <link rel="stylesheet" href="stylesheets/d3-audio-viz.css" />
+        <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="stylesheets/d3-audio-viz.css">
     </head>
     <body>
         <div id="chooser"></div>
         <div id="visualizer"></div>
+        <!-- year title album artist genre -->
+        <div id="metadata">
+            <div id="title"></div>
+            <div id="artist"></div>
+            <div id="album"></div>
+            <div id="time">
+                <div id="currentTime"></div> / <div id="totalTime"></div>
+            </div>
+        </div>
     </body>
 
     <script src="lib/d3.js"></script>
     <script src="lib/browser.min.js"></script>
     <script src="lib/react-with-addons.js"></script>
     <script src="lib/react-dom.js"></script>
+    <script src="lib/metadata-audio-parser.js"></script>
     <script type="text/babel" src="d3audioviz-src/main.js"></script>
     <!-- <script src="js/index-old.js"></script> -->
 </html>
