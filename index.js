@@ -10,12 +10,4 @@ const container = d3.select('#magic-container');
 
 const model = new Model();
 
-new MagicView(
-    model,
-    [
-        new TableView(model, container.append('svg').attr('id', 'table-svg')),
-        new BarChartView(model, container.append('svg').attr('id', 'bar-chart-svg')),
-        new MapView(model, container.append('svg').attr('id', 'map-svg'))
-    ],
-    d3.select('#magic-container')
-).init();
+window.magic = new MagicView(model, d3.select('#magic-container')).init();
