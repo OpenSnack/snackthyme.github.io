@@ -1,9 +1,18 @@
+import {csv} from 'd3';
+
 export class Model {
     constructor() {
         this._observers = [];
+        this.data = null;
         this._numViews = 0;
-        this.data = [];
         this.viewIndex = 0;
+    }
+
+    load(filename, callback) {
+        csv(filename, csv.csvParseRows).then((data) => {
+            this.data = data;
+            callback(this);
+        });
     }
 
     addObserver(view) {

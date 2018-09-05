@@ -1,0 +1,10 @@
+.svg-table-header {
+    fill: rgb(74, 153, 212);
+    shape-rendering: crispEdges;
+}
+
+.svg-table-header-text {
+    font-weight: bold;
+    alignment-baseline: middle;
+    fill: white;
+}

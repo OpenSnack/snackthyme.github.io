@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+
 import {MultiChartView} from './MultiChartView';
 import {TableView} from './TableView';
 import {BarChartView} from './BarChartView';
@@ -8,17 +9,25 @@ export class MagicView {
     constructor(model, container) {
         this.model = model;
         this.container = container;
-        const svg = this.container
-                        .append('svg')
-                          .attr('id', 'magic-svg');
+        this.svg = this.container
+          .append('svg')
+            .attr('id', 'magic-svg');
+
+        this.tableView = new TableView(model, this.svg);
+        this.barChartView = new BarChartView(model, this.svg);
+        this.mapView = new MapView(model, this.svg);
+        this.multiChartView = new MultiChartView(model, this.svg);
+
         this.viewOrder = [
-            {view: new TableView(model, svg), scrollDown: null, scrollUp: this.barChartToTable},
-            {view: new BarChartView(model, svg), scrollDown: this.tableToBarChart, scrollUp: this.mapToBarChart},
-            {view: new MapView(model, svg), scrollDown: this.barChartToMap, scrollUp: this.multiChartToMap},
-            {view: new MultiChartView(model, svg), scrollDown: this.mapToMultiChart, scrollUp: null}
+            {view: this.tableView, scrollDown: null, scrollUp: this.barChartToTable},
+            {view: this.barChartView, scrollDown: this.tableToBarChart, scrollUp: this.mapToBarChart},
+            {view: this.mapView, scrollDown: this.barChartToMap, scrollUp: this.multiChartToMap},
+            {view: this.multiChartView, scrollDown: this.mapToMultiChart, scrollUp: null}
         ];
+
         this.model.setNumViews(this.viewOrder.length);
         this._currentView = 0;
+        this.svgHeightRatio = 0.8;
     }
 
     init() {
@@ -29,7 +38,7 @@ export class MagicView {
 
     update(params) {
         // scroll in the next requested view according to the model
-        const newIndex = his.model.viewIndex;
+        const newIndex = this.model.viewIndex;
         if (newIndex > this._currentView) {
             this.viewOrder[newIndex]['scrollDown']();
         } else if (newIndex < this._currentView) {
@@ -38,7 +47,11 @@ export class MagicView {
     }
 
     initTable() {
+        this.svg
+            .attr('width', window.innerWidth)
+            .attr('height', window.innerHeight * this.svgHeightRatio);
 
+        this.tableView.enter('top');
     }
 
     tableToBarChart() {
