@@ -1,5 +1,6 @@
 .svg-table-header {
     fill: rgb(74, 153, 212);
+    stroke: rgb(74, 153, 212);
     shape-rendering: crispEdges;
 }
 
@@ -7,4 +8,14 @@
     font-weight: bold;
     alignment-baseline: middle;
     fill: white;
+}
+
+.svg-table-row {
+    fill: white;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.svg-table-row-text {
+    alignment-baseline: middle;
 }

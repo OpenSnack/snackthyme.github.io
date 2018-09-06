@@ -44,7 +44,7 @@ export class TableView extends View {
         const tableHeight = this.svg.attr('height') * dims.height;
         const centerLeftOffset = (this.svg.attr('width') - tableWidth) / 2;
 
-        function drawRow(data, className, group, isHeader) {
+        function drawRow(data, rowIndex, className, group) {
             var cols = group
               .selectAll('g')
               .data(data)
@@ -57,7 +57,8 @@ export class TableView extends View {
                 .classed(className, true)
                 // starting X offset given that the table is in the center
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * i)
-                .attr('y', 0)
+                // table row offset, where header is -1
+                .attr('y', tableHeight / numRows * (rowIndex + 1))
                 .attr('width', tableWidth / numCols)
                 .attr('height', tableHeight / numRows);
 
@@ -68,11 +69,14 @@ export class TableView extends View {
                 // left side of cell box plus a bit
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * (i + 0.1))
                 // vertical center of cell box
-                .attr('y', tableHeight / numRows / 2)
+                .attr('y', tableHeight / numRows * (rowIndex + 1.5))
                 .text((d) => d);
         }
 
-        const header = drawRow(this.model.data.columns, 'svg-table-header', this.header, true);
-
+        const header = drawRow(this.model.data.columns, -1, 'svg-table-header', this.header);
+        this.model.data.forEach((rowDict, rowIndex) => {
+            let rowData = this.model.data.columns.map((colName) => rowDict[colName]);
+            drawRow(rowData, rowIndex, 'svg-table-row', this.rows.append('g'));
+        });
     }
 }
