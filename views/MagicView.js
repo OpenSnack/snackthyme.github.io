@@ -13,6 +13,14 @@ export class MagicView {
           .append('svg')
             .attr('id', 'magic-svg');
 
+        this.svg.width = function() {
+            return this.node().clientWidth;
+        };
+
+        this.svg.height = function() {
+            return this.node().clientHeight;
+        };
+
         this.tableView = new TableView(model, this.svg);
         this.barChartView = new BarChartView(model, this.svg);
         this.mapView = new MapView(model, this.svg);
@@ -27,12 +35,11 @@ export class MagicView {
 
         this.model.setNumViews(this.viewOrder.length);
         this._currentView = 0;
-        this.svgHeightRatio = 0.8;
     }
 
     init() {
         this.model.addObserver(this);
-        this.initTable();
+        this.tableView.enter('top');
         return this;
     }
 
@@ -44,14 +51,6 @@ export class MagicView {
         } else if (newIndex < this._currentView) {
             this.viewOrder[newIndex]['scrollUp']();
         }
-    }
-
-    initTable() {
-        this.svg
-            .attr('width', window.innerWidth)
-            .attr('height', window.innerHeight * this.svgHeightRatio);
-
-        this.tableView.enter('top');
     }
 
     tableToBarChart() {

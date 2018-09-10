@@ -26,7 +26,7 @@ export class TableView extends View {
         this.table = this.svg
           .append('g')
             .attr('id', 'svg-table')
-            .attr('transform', 'translate(0,' + (dims.top * this.svg.attr('height')) + ')');
+            .attr('transform', 'translate(0,' + (dims.top * this.svg.height()) + ')');
 
         this.header = this.table.append('g');
         this.rows = this.table.append('g');
@@ -40,9 +40,9 @@ export class TableView extends View {
         const dims = this.dims[this.orientation()];
         const numCols = this.model.data.columns.length;
         const numRows = this.model.data.length;
-        const tableWidth = this.svg.attr('width') * dims.width;
-        const tableHeight = this.svg.attr('height') * dims.height;
-        const centerLeftOffset = (this.svg.attr('width') - tableWidth) / 2;
+        const tableWidth = this.svg.width() * dims.width;
+        const tableHeight = this.svg.height() * dims.height;
+        const centerLeftOffset = (this.svg.width() - tableWidth) / 2;
 
         function drawRow(data, rowIndex, className, group) {
             var cols = group

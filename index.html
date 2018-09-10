@@ -7,41 +7,43 @@
         <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700" rel="stylesheet">
     </head>
     <body>
-        <div id="page-header">
-            <div id="logo-flex">
-                <svg id="header-logo" viewBox="0 0 360 360">
-                    <defs>
-                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="0%" y2="100%" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%"  stop-color="#9890e3"/>
-                            <stop offset="100%" stop-color="#b1f4cf"/>
-                        </linearGradient>
-                    </defs>
-    
-                    <mask id="hollowHex">
-                        <rect x="0" y="0" width="360" height="360" fill="white"></rect>
-                        <polygon fill="black" points="180,40 225.5,70 225.5,120 180,150 134.5,120 134.5,70"></polygon>
-                    </mask>
-                    <mask id="circleHex">
-                        <rect x="0" y="0" width="360" height="360" fill="white"></rect>
-                        <circle cx="240" cy="250" r="30"></circle>
-                        <circle cx="260" cy="310" r="10"></circle>
-                        <circle cx="270" cy="200" r="10"></circle>
-                        <circle cx="310" cy="230" r="20"></circle>
-                        <circle cx="310" cy="280" r="15"></circle>
-                    </mask>
-                
-                    <g fill="url(#logo-gradient)">
-                        <polygon mask="url(#hollowHex)" points="180,0 260,50 260,140 180,190 100,140 100,50"></polygon>
-                        <polygon points="90,155 170,205 170,295 90,345 10,295 10,205"></polygon>
-                        <polygon mask="url(#circleHex)" points="270,155 350,205 350,295 270,345 190,295 190,205"></polygon>
-                    </g>
-                </svg>
-                <span class="logo-name">steve boddez</span>
+        <div id="main">
+            <div id="page-header">
+                <div id="logo-flex">
+                    <svg id="header-logo" viewBox="0 0 360 360">
+                        <defs>
+                            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="0%" y2="100%" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%"  stop-color="#9890e3"/>
+                                <stop offset="100%" stop-color="#b1f4cf"/>
+                            </linearGradient>
+                        </defs>
+        
+                        <mask id="hollowHex">
+                            <rect x="0" y="0" width="360" height="360" fill="white"></rect>
+                            <polygon fill="black" points="180,40 225.5,70 225.5,120 180,150 134.5,120 134.5,70"></polygon>
+                        </mask>
+                        <mask id="circleHex">
+                            <rect x="0" y="0" width="360" height="360" fill="white"></rect>
+                            <circle cx="240" cy="250" r="30"></circle>
+                            <circle cx="260" cy="310" r="10"></circle>
+                            <circle cx="270" cy="200" r="10"></circle>
+                            <circle cx="310" cy="230" r="20"></circle>
+                            <circle cx="310" cy="280" r="15"></circle>
+                        </mask>
+                    
+                        <g fill="url(#logo-gradient)">
+                            <polygon mask="url(#hollowHex)" points="180,0 260,50 260,140 180,190 100,140 100,50"></polygon>
+                            <polygon points="90,155 170,205 170,295 90,345 10,295 10,205"></polygon>
+                            <polygon mask="url(#circleHex)" points="270,155 350,205 350,295 270,345 190,295 190,205"></polygon>
+                        </g>
+                    </svg>
+                    <span id="logo-name">steve boddez</span>
+                </div>
             </div>
+            <div id="magic-container"></div>
+            <div id="scroll-indicator"></div>
         </div>
-        <div id="magic-container"></div>
-        <div id="scroll-indicator"></div>
-
+        
         <script src="dist/bundle.js"></script>
     </body>
 </html>
