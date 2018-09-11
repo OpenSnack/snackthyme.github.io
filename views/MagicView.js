@@ -40,7 +40,12 @@ export class MagicView {
     init() {
         this.model.addObserver(this);
         this.tableView.enter('top');
+        window.addEventListener('resize', this.refreshView.bind(this));
         return this;
+    }
+
+    refreshView() {
+        this.viewOrder[this._currentView].view.update();
     }
 
     update(params) {

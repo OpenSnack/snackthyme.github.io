@@ -39,21 +39,31 @@ export class TableView extends View {
 
         this.table = this.svg
           .append('g')
-            .attr('id', 'svg-table')
-            .attr('transform', 'translate(0,' + (dims.top * this.svg.height()) + ')');
+            .attr('id', 'svg-table');
 
         this.buildGradients();
 
         this.header = this.table.append('g');
         this.rows = this.table.append('g');
+        // content background
+        this.rows
+              .append('rect')
+                .classed('svg-table-content-background', true);
+        // content rows
+        this.model.data.forEach((rowDict) => {
+            this.rows.append('g')
+                .classed('row-group', true);
+        });
 
         this.update();
     }
 
     update() {
-        var table = this;
+        var tableView = this;
 
         const dims = this.dims[this.orientation()];
+        this.table.attr('transform', 'translate(0,' + (dims.top * this.svg.height()) + ')');
+
         const numCols = this.model.data.columns.length;
         const numRows = this.model.data.length;
         const tableWidth = this.svg.width() * dims.width;
@@ -61,16 +71,25 @@ export class TableView extends View {
         const centerLeftOffset = (this.svg.width() - tableWidth) / 2;
 
         function drawRow(data, rowIndex, className, group) {
-            var cols = group
+            const entering = group
               .selectAll('g')
               .data(data)
               .enter()
-              .append('g');
+              .append('g')
+              .classed('cell-group', true);
 
             // cell box
-            cols
+            entering
               .append('rect')
-                .classed(className, true)
+                .classed(className, true);
+
+            // cell content
+            entering
+              .append('text')
+                .classed(className + '-text', true);
+
+            group
+              .selectAll(`.${className}`)
                 // starting X offset given that the table is in the center
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * i)
                 // table row offset, where header is -1
@@ -78,35 +97,34 @@ export class TableView extends View {
                 .attr('width', tableWidth / numCols)
                 .attr('height', tableHeight / numRows);
 
-            // cell content
-            cols
-              .append('text')
-                .classed(className + '-text', true)
+            group
+              .selectAll(`.${className}-text`)
                 // left side of cell box plus a bit
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * (i + 0.1))
                 // vertical center of cell box
                 .attr('y', tableHeight / numRows * (rowIndex + 1.5))
                 .text((d) => d);
 
-            return cols;
+            return group.selectAll('.cell-group');
         }
 
         const header = drawRow(this.model.data.columns, -1, 'svg-table-header', this.header);
         header.selectAll('rect').attr('fill', 'url(#svg-table-header-gradient)');
 
-        // row background
+        // move content background into place
         this.rows
-          .append('rect')
+          .select('.svg-table-content-background')
             .attr('x', centerLeftOffset)
             .attr('y', tableHeight / numRows)
             .attr('width', tableWidth)
             .attr('height', tableHeight - tableHeight / numRows)
             .attr('fill', 'url(#svg-table-content-gradient)');
 
-        // rows
-        this.model.data.forEach((rowDict, rowIndex) => {
-            let rowData = this.model.data.columns.map((colName) => rowDict[colName]);
-            drawRow(rowData, rowIndex, 'svg-table-row', this.rows.append('g'));
+        // draw rows
+        this.rows.selectAll('g.row-group').each(function(d, i) {
+            let rowDict = tableView.model.data[i];
+            let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
+            drawRow(rowData, i, 'svg-table-row', d3.select(this));
         });
     }
 
