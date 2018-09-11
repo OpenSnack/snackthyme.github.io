@@ -1,18 +1,18 @@
 .svg-table-header {
-    fill: rgb(74, 153, 212);
-    stroke: rgb(74, 153, 212);
+    /* fill: rgb(74, 153, 212);
+    stroke: rgb(74, 153, 212); */
     shape-rendering: crispEdges;
 }
 
 .svg-table-header-text {
-    font-weight: bold;
+    font-weight: 400;
     alignment-baseline: middle;
     fill: white;
+    opacity: 0.8;
 }
 
 .svg-table-row {
-    fill: white;
-    stroke: black;
+    fill: rgb(0, 0, 0, 0);
     shape-rendering: crispEdges;
 }
 

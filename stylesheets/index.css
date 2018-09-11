@@ -1,6 +1,7 @@
 body {
     margin: 0;
-    font-family: 'Noto Sans', serif;
+    font-family: 'Work Sans', serif;
+    font-weight: 200;
     background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
 }
 
