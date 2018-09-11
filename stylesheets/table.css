@@ -19,3 +19,9 @@
 .svg-table-row-text {
     alignment-baseline: middle;
 }
+
+@media screen and (min-width: 1921px) {
+    .svg-table-header-text, .svg-table-row-text {
+        font-size: 2em;
+    }
+}
