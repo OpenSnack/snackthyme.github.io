@@ -10,7 +10,7 @@ export class TableView extends View {
             landscape: {
                 width: 0.5,
                 height: 0.7,
-                top: 0.5
+                top: 0.4
             },
             portrait: {
                 width: 0.9,
@@ -23,13 +23,13 @@ export class TableView extends View {
         this.gradients = [
             {
                 id: 'svg-table-header-gradient',
-                stop1: 'rgba(48,207,208,0.9)',
-                stop2: 'rgba(48,207,208,0.9)'
+                stop1: 'rgb(245, 113, 67)',
+                stop2: 'rgb(245, 113, 67)'
             },
             {
                 id: 'svg-table-content-gradient',
-                stop1: 'rgba(221,241,249,1)',
-                stop2: 'rgba(160,216,239,1)'
+                stop1: 'rgba(255,255,255,0.2)',
+                stop2: 'rgba(255,255,255,0.2)'
             }
         ];
     }

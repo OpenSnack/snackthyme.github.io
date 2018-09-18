@@ -2,7 +2,7 @@ body {
     margin: 0;
     font-family: 'Work Sans', serif;
     font-weight: 200;
-    background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+    background-image: linear-gradient(to top, rgb(255,141,0) 0%, rgb(134,0,216) 100%);
 }
 
 #main {
@@ -41,23 +41,22 @@ body {
 }
 
 #logo-name {
-    color: #a5c2d9;
+    color: white;
     margin-left: 0.5em;
-    opacity: 0.8;
     font-size: 2em;
 }
 
 #caption {
     position: absolute;
     color: white;
-    font-size: 3em;
+    font-size: 4em;
     text-align: center;
 }
 
 @media screen and (min-width: 1921px) {
     /* 1440p screens */
     #caption {
-        font-size: 4em;
+        font-size: 5em;
     }
 }
 

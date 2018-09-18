@@ -18,6 +18,8 @@
 
 .svg-table-row-text {
     alignment-baseline: middle;
+    fill: white;
+    font-weight: 300;
 }
 
 @media screen and (min-width: 1921px) {
