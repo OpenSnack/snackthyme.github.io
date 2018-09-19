@@ -68,7 +68,7 @@ export class TableView extends View {
                 .classed('row-group', true);
         });
 
-        this.update();
+        this.update(window.scrollY);
     }
 
     update(scrollY) {
