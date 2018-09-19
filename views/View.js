@@ -1,24 +1,28 @@
 export class View {
-    constructor(model, svg) {
+    constructor(model, svg, container) {
         this.model = model;
         this.svg = svg;
+        this.container = container;
     }
 
-    enter(fromLocation, callback) {
-        // user scrolled and this view is coming in from off screen
-        // fromLocation is 'top' or 'bottom'
+    init(callback) {
+
     }
 
-    update() {
+    update(scrollY) {
         // do something with model data and put results into svg
-    }
-
-    exit(toLocation, callback) {
-        // user scrolled and this view is leaving the screen for some other view
-        // toLocation is 'top' or 'bottom'
     }
 
     orientation() {
         return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+    }
+
+    setCaption(params) {
+        this.caption
+            .style('width', params.coords.width * window.innerWidth + 'px')
+            .style('top', params.coords.top * window.innerHeight + 'px')
+            .style('left', params.coords.left * window.innerWidth + 'px')
+            .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1)
+            .text(params.text);
     }
 }

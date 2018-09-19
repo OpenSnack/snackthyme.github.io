@@ -3,14 +3,14 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class TableView extends View {
-    constructor(model, svg) {
-        super(model, svg);
+    constructor(model, svg, container) {
+        super(model, svg, container);
 
         this.dims = {
             landscape: {
                 width: 0.5,
                 height: 0.7,
-                top: 0.4
+                top: 0.5
             },
             portrait: {
                 width: 0.9,
@@ -32,14 +32,27 @@ export class TableView extends View {
                 stop2: 'rgba(255,255,255,0.2)'
             }
         ];
+
+        this._captionParams = {
+            text: 'Data looks lame at first glance.',
+            coords: {
+                width: 0.7,
+                top: 0.25,
+                left: 0.15
+            }
+        };
     }
 
-    enter(fromLocation, callback) {
+    init(callback) {
         const dims = this.dims[this.orientation()];
 
         this.table = this.svg
           .append('g')
             .attr('id', 'svg-table');
+
+        this.caption = this.container
+          .append('span')
+            .classed('caption', true);
 
         this.buildGradients();
 
@@ -58,16 +71,20 @@ export class TableView extends View {
         this.update();
     }
 
-    update() {
+    update(scrollY) {
+        if (!scrollY) {scrollY = 0;}
         var tableView = this;
 
+        let capOpacity = this.captionOpacity(scrollY);
+        this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
+
         const dims = this.dims[this.orientation()];
-        this.table.attr('transform', 'translate(0,' + (dims.top * this.svg.height()) + ')');
+        this.table.attr('transform', 'translate(0,' + (dims.top * this.svg.screenHeight()) + ')');
 
         const numCols = this.model.data.columns.length;
         const numRows = this.model.data.length;
         const tableWidth = this.svg.width() * dims.width;
-        const tableHeight = this.svg.height() * dims.height;
+        const tableHeight = this.svg.screenHeight() * dims.height;
         const centerLeftOffset = (this.svg.width() - tableWidth) / 2;
 
         function drawRow(data, rowIndex, className, group) {
@@ -117,7 +134,7 @@ export class TableView extends View {
             .attr('x', centerLeftOffset)
             .attr('y', tableHeight / numRows)
             .attr('width', tableWidth)
-            .attr('height', tableHeight - tableHeight / numRows)
+            .attr('height', tableHeight)
             .attr('fill', 'url(#svg-table-content-gradient)');
 
         // draw rows
@@ -126,6 +143,14 @@ export class TableView extends View {
             let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
             drawRow(rowData, i, 'svg-table-row', d3.select(this));
         });
+    }
+
+    captionOpacity(scrollY) {
+        let zeroPoint = this._captionParams.coords.top * this.svg.screenHeight();
+        let scrollDiff = zeroPoint - scrollY;
+        if (scrollDiff < 0) return 0;
+
+        return scrollDiff / zeroPoint;
     }
 
     buildGradients() {
