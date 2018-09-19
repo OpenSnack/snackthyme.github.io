@@ -1,8 +1,8 @@
 export class View {
-    constructor(model, svg, container) {
+    constructor(model, svg, parent) {
         this.model = model;
         this.svg = svg;
-        this.container = container;
+        this.parent = parent;
     }
 
     init(callback) {

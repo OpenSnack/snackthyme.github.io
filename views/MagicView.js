@@ -29,10 +29,10 @@ export class MagicView {
             return this.node().clientHeight / mult;
         };
 
-        this.tableView = new TableView(model, this.svg, this.container);
-        this.barChartView = new BarChartView(model, this.svg, this.container);
-        this.mapView = new MapView(model, this.svg, this.container);
-        this.multiChartView = new MultiChartView(model, this.svg, this.container);
+        this.tableView = new TableView(model, this.svg, this);
+        this.barChartView = new BarChartView(model, this.svg, this);
+        this.mapView = new MapView(model, this.svg, this);
+        this.multiChartView = new MultiChartView(model, this.svg, this);
 
         this.views = [
             this.tableView,

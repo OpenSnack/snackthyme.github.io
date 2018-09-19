@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class TableView extends View {
-    constructor(model, svg, container) {
-        super(model, svg, container);
+    constructor(model, svg, parent) {
+        super(model, svg, parent);
 
         this.dims = {
             landscape: {
@@ -50,7 +50,7 @@ export class TableView extends View {
           .append('g')
             .attr('id', 'svg-table');
 
-        this.caption = this.container
+        this.caption = this.parent.container
           .append('span')
             .classed('caption', true);
 
