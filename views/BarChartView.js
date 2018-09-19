@@ -8,23 +8,48 @@ export class BarChartView extends View {
 
         this.dims = {
             landscape: {
-                width: 0.5,
-                height: 0.7,
-                top: 0.6
+                off: {
+                    width: 0,
+                    height: 0.7,
+                    top: 0.6
+                },
+                ontable: {
+                    width: 0.5,
+                    height: 0.7,
+                    top: 0.6
+                },
+                focused: {
+                    width: 0.7,
+                    height: 0.7,
+                    top: 0.6
+                }
             },
             portrait: {
-                width: 0.9,
-                height: 0.7,
-                top: 0.6
+                off: {
+                    width: 0,
+                    height: 0.7,
+                    top: 0.6
+                },
+                ontable: {
+                    width: 0.9,
+                    height: 0.7,
+                    top: 0.6
+                },
+                focused: {
+                    width: 0.9,
+                    height: 0.7,
+                    top: 0.6
+                }
             }
         };
 
         this._redThreshold = 5000;
         this._sliderValue = 0;
+        this._state = 'off';
     }
 
     init(callback) {
-        const dims = this.dims[this.orientation()];
+        const dims = this.dims[this.orientation()][this._state];
         this.chart = this.svg
           .append('g')
             .attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
@@ -37,7 +62,9 @@ export class BarChartView extends View {
     }
 
     update(scrollY) {
-        const dims = this.dims[this.orientation()];
+        const changed = this.updateState(scrollY);
+
+        const dims = this.dims[this.orientation()][this._state];
         this.chart.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
 
         const numBars = this.model.data.length;
@@ -55,7 +82,9 @@ export class BarChartView extends View {
           .data(this.model.data, (d) => d.id)
           .enter()
           .append('rect')
-            .attr('class', 'svg-bar-chart-bar')
+            .attr('class', 'svg-bar-chart-bar');
+
+        this.chart.selectAll('.svg-bar-chart-bar')
             .attr('x', centerLeftOffset)
             .attr('y', (d) => this.yScale(d.ID))
             .attr('width', (d) => this.xScale(this.barValue(d)))
@@ -65,12 +94,28 @@ export class BarChartView extends View {
           .data(this.model.data, (d) => d.id)
           .enter()
           .append('rect')
-            .attr('class', 'svg-bar-chart-over-bar')
+            .attr('class', 'svg-bar-chart-over-bar');
+
+        this.chart.selectAll('.svg-bar-chart-over-bar')
             .attr('x', blueBarRight)
             .attr('y', (d) => this.yScale(d.ID))
             .attr('width', (d) => this.xOverScale(this.barValue(d)))
             .attr('height', this.yScale.bandwidth())
             .attr('fill', 'red');
+    }
+
+    updateState(scrollY) {
+        let oldState = this._state;
+        let ontableThreshold = this.svg.screenHeight() * (this.dims[this.orientation()]['off'].top - 0.3);
+        let focusedThreshold = this.svg.screenHeight() * (this.dims[this.orientation()]['off'].top - 0.15);
+        if (scrollY < ontableThreshold) {
+            this._state = 'off';
+        } else if (ontableThreshold <= scrollY && scrollY < focusedThreshold) {
+            this._state = 'ontable';
+        } else {
+            this._state = 'focused';
+        }
+        return oldState !== this._state; // return true if the state changed
     }
 
     barValue(d) {

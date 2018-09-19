@@ -50,13 +50,13 @@ export class MagicView {
         this.svg.attr('height', window.innerHeight * this._svgSizeMult + 'px');
         this.views.forEach((view) => {view.init();});
 
-        window.addEventListener('resize', this.refreshView.bind(this));
-        window.addEventListener('scroll', this.refreshView.bind(this));
+        window.addEventListener('resize', this.refreshViews.bind(this));
+        window.addEventListener('scroll', this.refreshViews.bind(this));
         return this;
     }
 
-    refreshView() {
+    refreshViews() {
         this.svg.attr('height', window.innerHeight * this._svgSizeMult + 'px');
-        this.views[this._currentView].update(window.scrollY);
+        this.views.forEach((view) => {view.update(window.scrollY);});
     }
 }
