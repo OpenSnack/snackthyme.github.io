@@ -10,12 +10,12 @@ export class TableView extends View {
             landscape: {
                 width: 0.5,
                 height: 0.7,
-                top: 0.5
+                top: 0.6
             },
             portrait: {
                 width: 0.9,
                 height: 0.7,
-                top: 0.5
+                top: 0.6
             }
         };
 
@@ -79,7 +79,7 @@ export class TableView extends View {
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
 
         const dims = this.dims[this.orientation()];
-        this.table.attr('transform', 'translate(0,' + (dims.top * this.svg.screenHeight()) + ')');
+        this.table.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
 
         const numCols = this.model.data.columns.length;
         const numRows = this.model.data.length;
@@ -110,7 +110,7 @@ export class TableView extends View {
                 // starting X offset given that the table is in the center
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * i)
                 // table row offset, where header is -1
-                .attr('y', tableHeight / numRows * (rowIndex + 1))
+                .attr('y', tableHeight / numRows * rowIndex)
                 .attr('width', tableWidth / numCols)
                 .attr('height', tableHeight / numRows);
 
@@ -119,7 +119,7 @@ export class TableView extends View {
                 // left side of cell box plus a bit
                 .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * (i + 0.1))
                 // vertical center of cell box
-                .attr('y', tableHeight / numRows * (rowIndex + 1.5))
+                .attr('y', tableHeight / numRows * (rowIndex + 0.5))
                 .text((d) => d);
 
             return group.selectAll('.cell-group');
@@ -132,7 +132,7 @@ export class TableView extends View {
         this.rows
           .select('.svg-table-content-background')
             .attr('x', centerLeftOffset)
-            .attr('y', tableHeight / numRows)
+            .attr('y', 0)
             .attr('width', tableWidth)
             .attr('height', tableHeight)
             .attr('fill', 'url(#svg-table-content-gradient)');
