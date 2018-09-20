@@ -9,7 +9,7 @@ export class BarChartView extends View {
         this.dims = {
             landscape: {
                 off: {
-                    width: 0,
+                    width: 0.5,
                     height: 0.7,
                     top: 0.6
                 },
@@ -26,7 +26,7 @@ export class BarChartView extends View {
             },
             portrait: {
                 off: {
-                    width: 0,
+                    width: 0.5,
                     height: 0.7,
                     top: 0.6
                 },
@@ -43,9 +43,23 @@ export class BarChartView extends View {
             }
         };
 
+        this.gradients = [
+            {
+                id: 'svg-bar-chart-bar-gradient',
+                stops: [
+                    {color: 'white', offset: '0%'},
+                    {color: 'white', offset: '67%'},
+                    {color: 'red', offset: '67%'},
+                ],
+                units: 'userSpaceOnUse'
+            }
+        ];
+
+        this._numBars = 5;
         this._redThreshold = 5000;
         this._sliderValue = 0;
         this._state = 'off';
+        this._transitioning = false;
     }
 
     init(callback) {
@@ -54,54 +68,60 @@ export class BarChartView extends View {
           .append('g')
             .attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
 
-        this.xScale = d3.scaleLinear().domain([0, this._redThreshold]).clamp(true);
+        this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
-        this.xOverScale = d3.scaleLinear().domain([this._redThreshold, this._redThreshold * 2]).clamp(true);
-
-        this.update(window.scrollY);
-    }
-
-    update(scrollY) {
-        const changed = this.updateState(scrollY);
-
-        const dims = this.dims[this.orientation()][this._state];
-        this.chart.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
-
-        const numBars = this.model.data.length;
-        const chartWidth = this.svg.width() * dims.width;
-        const chartHeight = this.svg.screenHeight() * dims.height;
-        const centerLeftOffset = (this.svg.width() - chartWidth) / 2;
-        const blueBarRight = centerLeftOffset + dims.width * this.svg.width() * 2/3;
-        const overBarRight = centerLeftOffset + dims.width * this.svg.width() * 4/3;
-
-        this.xScale.rangeRound([0, chartWidth * 2/3]);
-        this.yScale.rangeRound([0, chartHeight]);
-        this.xOverScale.rangeRound([0, overBarRight - blueBarRight]);
 
         this.chart.selectAll('.svg-bar-chart-bar')
-          .data(this.model.data, (d) => d.id)
+          .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
           .append('rect')
             .attr('class', 'svg-bar-chart-bar');
 
-        this.chart.selectAll('.svg-bar-chart-bar')
-            .attr('x', centerLeftOffset)
-            .attr('y', (d) => this.yScale(d.ID))
-            .attr('width', (d) => this.xScale(this.barValue(d)))
-            .attr('height', this.yScale.bandwidth());
+        this.buildGradient();
 
-        this.chart.selectAll('.svg-bar-chart-over-bar')
-          .data(this.model.data, (d) => d.id)
-          .enter()
-          .append('rect')
-            .attr('class', 'svg-bar-chart-over-bar');
+        this.update(window.scrollY);
+    }
 
-        this.chart.selectAll('.svg-bar-chart-over-bar')
-            .attr('x', blueBarRight)
-            .attr('y', (d) => this.yScale(d.ID))
-            .attr('width', (d) => this.xOverScale(this.barValue(d)))
-            .attr('height', this.yScale.bandwidth())
-            .attr('fill', 'red');
+    update(scrollY, trigger) {
+        const view = this;
+        const changed = this.updateState(scrollY);
+
+        if (changed || trigger === 'resize') {
+            const dims = this.dims[this.orientation()][this._state];
+            this.chart.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
+
+            const chartWidth = this.svg.width() * dims.width;
+            const chartHeight = this.svg.screenHeight() * dims.height;
+            const centerLeftOffset = (this.svg.width() - chartWidth) / 2;
+            const barRight = centerLeftOffset + chartWidth;
+
+            this.xScale.rangeRound([0, chartWidth]);
+            this.yScale.rangeRound([0, chartHeight])
+                .padding(this._state === 'focused' ? 0.05 : 0);
+
+            this.gradient
+                .attr('x1', centerLeftOffset)
+                .attr('x2', barRight);
+
+            this.chart.selectAll('.svg-bar-chart-bar')
+                .each((d, i) => {
+                    if (d3.active(this)) {console.log('active');}
+                });
+
+            this.chart.selectAll('.svg-bar-chart-bar')
+                .transition()
+                .attr('x', centerLeftOffset)
+                .attr('y', (d) => this.yScale(d.ID))
+                .attr('height', this.yScale.bandwidth())
+                .duration(500)
+                .attr('width', (d) => {
+                    if (this._state === 'off') {
+                        return 0;
+                    }
+                    return this.xScale(this.barValue(d));
+                })
+                .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
+        }
     }
 
     updateState(scrollY) {
@@ -122,5 +142,34 @@ export class BarChartView extends View {
         let rating = Number(d.Rating);
         let ratio = Number(d.Ratio);
         return rating + this._sliderValue * rating * ratio;
+    }
+
+    buildGradient() {
+        const defs = this.chart.append('defs');
+        this.gradient = defs
+          .append('linearGradient')
+            .attr('id', 'svg-bar-chart-bar-gradient')
+            .attr('gradientUnits', 'userSpaceOnUse');
+
+        this.gradient.append('stop')
+            .attr('offset', '0%')
+            .attr('stop-color', 'white');
+
+        this.gradient.append('stop')
+            .attr('offset', '67%')
+            .attr('stop-color', 'white');
+
+        this.gradient.append('stop')
+            .attr('offset', '67%')
+            .attr('stop-color', 'red');
+
+        this.gradient.append('stop')
+            .attr('offset', '95%')
+            .attr('stop-color', 'red');
+
+        this.gradient.append('stop')
+            .attr('offset', '100%')
+            .attr('stop-color', 'red')
+            .attr('stop-opacity', '0');
     }
 }
