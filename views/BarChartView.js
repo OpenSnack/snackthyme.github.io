@@ -26,7 +26,7 @@ export class BarChartView extends View {
             },
             portrait: {
                 off: {
-                    width: 0.5,
+                    width: 0.9,
                     height: 0.7,
                     top: 0.6
                 },
@@ -55,6 +55,8 @@ export class BarChartView extends View {
             }
         ];
 
+        this.screenHeightRatio = 1;
+
         this._numBars = 5;
         this._redThreshold = 5000;
         this._sliderValue = 0;
@@ -66,7 +68,7 @@ export class BarChartView extends View {
         const dims = this.dims[this.orientation()][this._state];
         this.chart = this.svg
           .append('g')
-            .attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
+            .attr('transform', `translate(0, ${dims.top * this.svg.height()})`);
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
@@ -84,14 +86,14 @@ export class BarChartView extends View {
 
     update(scrollY, trigger) {
         const view = this;
-        const changed = this.updateState(scrollY);
+        const changed = this.updateState(scrollY); // do things that need to know the state AFTER this
+
+        this.chart.attr('transform', `translate(0, ${this.startingPosition() - scrollY})`);
+        const dims = this.dims[this.orientation()][this._state];
 
         if (changed || trigger === 'resize') {
-            const dims = this.dims[this.orientation()][this._state];
-            this.chart.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
-
             const chartWidth = this.svg.width() * dims.width;
-            const chartHeight = this.svg.screenHeight() * dims.height;
+            const chartHeight = this.svg.height() * dims.height;
             const centerLeftOffset = (this.svg.width() - chartWidth) / 2;
             const barRight = centerLeftOffset + chartWidth;
 
@@ -102,11 +104,6 @@ export class BarChartView extends View {
             this.gradient
                 .attr('x1', centerLeftOffset)
                 .attr('x2', barRight);
-
-            this.chart.selectAll('.svg-bar-chart-bar')
-                .each((d, i) => {
-                    if (d3.active(this)) {console.log('active');}
-                });
 
             this.chart.selectAll('.svg-bar-chart-bar')
                 .transition()
@@ -124,10 +121,22 @@ export class BarChartView extends View {
         }
     }
 
+    startingPosition() {
+        return this.dims[this.orientation()]['off'].top * this.visibleHeight();
+    }
+
+    ontableThreshold() {
+        return this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.35);
+    }
+
+    focusedThreshold() {
+        return this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.15);
+    }
+
     updateState(scrollY) {
         let oldState = this._state;
-        let ontableThreshold = this.svg.screenHeight() * (this.dims[this.orientation()]['off'].top - 0.3);
-        let focusedThreshold = this.svg.screenHeight() * (this.dims[this.orientation()]['off'].top - 0.15);
+        let ontableThreshold = this.ontableThreshold();
+        let focusedThreshold = this.focusedThreshold();
         if (scrollY < ontableThreshold) {
             this._state = 'off';
         } else if (ontableThreshold <= scrollY && scrollY < focusedThreshold) {

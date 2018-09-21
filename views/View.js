@@ -13,6 +13,14 @@ export class View {
         // do something with model data and put results into svg
     }
 
+    setHeight(screenHeight) {
+        this.svg.attr('height', screenHeight * this.screenHeightRatio);
+    }
+
+    visibleHeight() {
+        return this.svg.height() / this.screenHeightRatio;
+    }
+
     orientation() {
         return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
     }

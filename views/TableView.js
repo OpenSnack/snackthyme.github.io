@@ -41,6 +41,8 @@ export class TableView extends View {
                 left: 0.15
             }
         };
+
+        this.screenHeightRatio = 2;
     }
 
     init(callback) {
@@ -79,12 +81,12 @@ export class TableView extends View {
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
 
         const dims = this.dims[this.orientation()];
-        this.table.attr('transform', `translate(0, ${dims.top * this.svg.screenHeight()})`);
+        this.table.attr('transform', `translate(0, ${dims.top * this.visibleHeight()})`);
 
         const numCols = this.model.data.columns.length;
         const numRows = this.model.data.length;
         const tableWidth = this.svg.width() * dims.width;
-        const tableHeight = this.svg.screenHeight() * dims.height;
+        const tableHeight = this.visibleHeight() * dims.height;
         const centerLeftOffset = (this.svg.width() - tableWidth) / 2;
 
         function drawRow(data, rowIndex, className, group) {
@@ -146,7 +148,7 @@ export class TableView extends View {
     }
 
     captionOpacity(scrollY) {
-        let zeroPoint = this._captionParams.coords.top * this.svg.screenHeight();
+        let zeroPoint = this._captionParams.coords.top * this.visibleHeight();
         let scrollDiff = zeroPoint - scrollY;
         if (scrollDiff < 0) return 0;
 

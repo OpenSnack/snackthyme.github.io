@@ -9,30 +9,18 @@ export class MagicView {
     constructor(model, container) {
         this.model = model;
         this.container = container;
-        this.svg = this.container
-          .append('svg')
-            .attr('id', 'magic-svg');
         this.caption = this.container.select('#caption');
 
         this._svgSizeMult = 5;
         const mult = this._svgSizeMult;
 
-        this.svg.width = function() {
-            return this.node().clientWidth;
-        };
-
-        this.svg.totalHeight = function() {
-            return this.node().clientHeight;
-        };
-
-        this.svg.screenHeight = function() {
-            return this.node().clientHeight / mult;
-        };
-
-        this.tableView = new TableView(model, this.svg, this);
-        this.barChartView = new BarChartView(model, this.svg, this);
-        this.mapView = new MapView(model, this.svg, this);
-        this.multiChartView = new MultiChartView(model, this.svg, this);
+        const tableSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-1'));
+        this.tableView = new TableView(model, tableSVG, this);
+        const barChartSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-2'));
+        this.barChartView = new BarChartView(model, barChartSVG, this);
+        const mapMultiSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
+        this.mapView = new MapView(model, mapMultiSVG, this);
+        this.multiChartView = new MultiChartView(model, mapMultiSVG, this);
 
         this.views = [
             this.tableView,
@@ -47,8 +35,11 @@ export class MagicView {
 
     init() {
         this.model.addObserver(this);
-        this.svg.attr('height', window.innerHeight * this._svgSizeMult + 'px');
-        this.views.forEach((view) => {view.init();});
+        this.container.style('height', window.innerHeight * this._svgSizeMult + 'px');
+        this.views.forEach((view) => {
+            view.setHeight(window.innerHeight);
+            view.init();
+        });
 
         window.addEventListener('resize', () => this.refreshViews('resize'));
         window.addEventListener('scroll', () => this.refreshViews('scroll'));
@@ -56,7 +47,22 @@ export class MagicView {
     }
 
     refreshViews(trigger) {
-        this.svg.attr('height', window.innerHeight * this._svgSizeMult + 'px');
-        this.views.forEach((view) => {view.update(window.scrollY, trigger);});
+        this.views.forEach((view) => {
+            view.setHeight(window.innerHeight);
+            view.update(window.scrollY, trigger);
+        });
+    }
+
+    viewify(selection) {
+        // adds some extras to a D3 SVG selection
+        selection.width = function() {
+            return this.node().clientWidth;
+        };
+
+        selection.height = function() {
+            return this.node().clientHeight;
+        };
+
+        return selection;
     }
 }
