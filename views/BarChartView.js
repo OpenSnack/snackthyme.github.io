@@ -43,18 +43,6 @@ export class BarChartView extends View {
             }
         };
 
-        this.gradients = [
-            {
-                id: 'svg-bar-chart-bar-gradient',
-                stops: [
-                    {color: 'white', offset: '0%'},
-                    {color: 'white', offset: '67%'},
-                    {color: 'red', offset: '67%'},
-                ],
-                units: 'userSpaceOnUse'
-            }
-        ];
-
         this.screenHeightRatio = 1;
 
         this._numBars = 5;
@@ -98,7 +86,7 @@ export class BarChartView extends View {
             const barRight = centerLeftOffset + chartWidth;
 
             this.xScale.rangeRound([0, chartWidth]);
-            this.yScale.rangeRound([0, chartHeight])
+            this.yScale.range([0, chartHeight])
                 .padding(this._state === 'focused' ? 0.05 : 0);
 
             this.gradient
@@ -123,6 +111,10 @@ export class BarChartView extends View {
 
     startingPosition() {
         return this.dims[this.orientation()]['off'].top * this.visibleHeight();
+    }
+
+    focusedPosition() {
+
     }
 
     ontableThreshold() {
@@ -162,23 +154,22 @@ export class BarChartView extends View {
 
         this.gradient.append('stop')
             .attr('offset', '0%')
-            .attr('stop-color', 'white');
+            .attr('stop-color', 'rgba(255,255,255, 0.5)');
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'white');
+            .attr('stop-color', 'rgba(255,255,255, 1)');
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'red');
+            .attr('stop-color', 'rgba(174,76,227, 1)');
 
         this.gradient.append('stop')
             .attr('offset', '95%')
-            .attr('stop-color', 'red');
+            .attr('stop-color', 'rgba(174,76,227, 1)');
 
         this.gradient.append('stop')
             .attr('offset', '100%')
-            .attr('stop-color', 'red')
-            .attr('stop-opacity', '0');
+            .attr('stop-color', 'rgba(174,76,227, 0)');
     }
 }

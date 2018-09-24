@@ -143,6 +143,7 @@ export class TableView extends View {
         this.rows.selectAll('g.row-group').each(function(d, i) {
             let rowDict = tableView.model.data[i];
             let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
+            // eslint-disable-next-line no-invalid-this
             drawRow(rowData, i, 'svg-table-row', d3.select(this));
         });
     }

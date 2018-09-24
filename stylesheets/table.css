@@ -1,3 +1,8 @@
+#magic-svg-1 {
+    position: relative;
+    z-index: 999;
+}
+
 .svg-table-header {
     /* fill: rgb(74, 153, 212);
     stroke: rgb(74, 153, 212); */
