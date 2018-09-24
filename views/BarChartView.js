@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class BarChartView extends View {
-    constructor(model, svg, parent) {
+    constructor(model, svg, parent, params) {
         super(model, svg, parent);
 
         this.dims = {
@@ -45,6 +45,10 @@ export class BarChartView extends View {
 
         this.screenHeightRatio = 1;
 
+        if (params && params.maskID) {
+            this.maskID = params.maskID;
+        }
+
         this._numBars = 5;
         this._redThreshold = 5000;
         this._sliderValue = 0;
@@ -65,7 +69,8 @@ export class BarChartView extends View {
           .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
           .append('rect')
-            .attr('class', 'svg-bar-chart-bar');
+            .attr('class', 'svg-bar-chart-bar')
+            .attr('mask', (d, i) => `url(#${this.maskID}-${i})`);
 
         this.buildGradient();
 

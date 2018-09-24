@@ -17,7 +17,7 @@ export class MagicView {
         const tableSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-1'));
         this.tableView = new TableView(model, tableSVG, this);
         const barChartSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-2'));
-        this.barChartView = new BarChartView(model, barChartSVG, this);
+        this.barChartView = new BarChartView(model, barChartSVG, this, {'maskID': this.tableView.textMaskID});
         const mapMultiSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
         this.mapView = new MapView(model, mapMultiSVG, this);
         this.multiChartView = new MultiChartView(model, mapMultiSVG, this);

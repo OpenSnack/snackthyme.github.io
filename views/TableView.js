@@ -43,6 +43,8 @@ export class TableView extends View {
         };
 
         this.screenHeightRatio = 2;
+        this.textID = 'svg-table-row';
+        this.textMaskID = `${this.textID}-mask`;
     }
 
     init(callback) {
@@ -51,6 +53,8 @@ export class TableView extends View {
         this.table = this.svg
           .append('g')
             .attr('id', 'svg-table');
+
+        this.defs = this.table.append('defs');
 
         this.caption = this.parent.container
           .append('span')
@@ -75,7 +79,8 @@ export class TableView extends View {
 
     update(scrollY) {
         if (!scrollY) {scrollY = 0;}
-        var tableView = this;
+
+        const tableView = this;
 
         let capOpacity = this.captionOpacity(scrollY);
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
@@ -83,60 +88,24 @@ export class TableView extends View {
         const dims = this.dims[this.orientation()];
         this.table.attr('transform', `translate(0, ${dims.top * this.visibleHeight()})`);
 
-        const numCols = this.model.data.columns.length;
-        const numRows = this.model.data.length;
-        const tableWidth = this.svg.width() * dims.width;
-        const tableHeight = this.visibleHeight() * dims.height;
-        const centerLeftOffset = (this.svg.width() - tableWidth) / 2;
+        const posParams = {
+            numCols: this.model.data.columns.length,
+            numRows: this.model.data.length,
+            tableWidth: this.svg.width() * dims.width,
+            tableHeight: this.visibleHeight() * dims.height
+        };
+        posParams.centerLeftOffset = (this.svg.width() - posParams.tableWidth) / 2;
 
-        function drawRow(data, rowIndex, className, group) {
-            const entering = group
-              .selectAll('g')
-              .data(data)
-              .enter()
-              .append('g')
-              .classed('cell-group', true);
-
-            // cell box
-            entering
-              .append('rect')
-                .classed(className, true);
-
-            // cell content
-            entering
-              .append('text')
-                .classed(className + '-text', true);
-
-            group
-              .selectAll(`.${className}`)
-                // starting X offset given that the table is in the center
-                .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * i)
-                // table row offset, where header is -1
-                .attr('y', tableHeight / numRows * rowIndex)
-                .attr('width', tableWidth / numCols)
-                .attr('height', tableHeight / numRows);
-
-            group
-              .selectAll(`.${className}-text`)
-                // left side of cell box plus a bit
-                .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * (i + 0.1))
-                // vertical center of cell box
-                .attr('y', tableHeight / numRows * (rowIndex + 0.5))
-                .text((d) => d);
-
-            return group.selectAll('.cell-group');
-        }
-
-        const header = drawRow(this.model.data.columns, -1, 'svg-table-header', this.header);
+        const header = this.drawRow(this.model.data.columns, -1, 'svg-table-header', this.header, posParams);
         header.selectAll('rect').attr('fill', 'url(#svg-table-header-gradient)');
 
         // move content background into place
         this.rows
           .select('.svg-table-content-background')
-            .attr('x', centerLeftOffset)
+            .attr('x', posParams.centerLeftOffset)
             .attr('y', 0)
-            .attr('width', tableWidth)
-            .attr('height', tableHeight)
+            .attr('width', posParams.tableWidth)
+            .attr('height', posParams.tableHeight)
             .attr('fill', 'url(#svg-table-content-gradient)');
 
         // draw rows
@@ -144,8 +113,57 @@ export class TableView extends View {
             let rowDict = tableView.model.data[i];
             let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
             // eslint-disable-next-line no-invalid-this
-            drawRow(rowData, i, 'svg-table-row', d3.select(this));
+            tableView.drawRow(rowData, i, tableView.textID, d3.select(this), posParams);
         });
+    }
+
+    drawRow(data, rowIndex, className, group, position) {
+        const {numCols, numRows, tableWidth, tableHeight, centerLeftOffset} = position;
+        const tableView = this;
+
+        const entering = group
+          .selectAll('g')
+          .data(data)
+          .enter()
+          .append('g')
+            .classed('cell-group', true);
+
+        // cell box
+        entering
+          .append('rect')
+            .classed(className, true);
+
+        // cell content
+        entering
+          .append('text')
+            .classed(className + '-text', true);
+
+        group
+          .selectAll(`.${className}`)
+            // starting X offset given that the table is in the center
+            .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * i)
+            // table row offset, where header is -1
+            .attr('y', tableHeight / numRows * rowIndex)
+            .attr('width', tableWidth / numCols)
+            .attr('height', tableHeight / numRows);
+
+        group
+          .selectAll(`.${className}-text`)
+            // left side of cell box plus a bit
+            .attr('x', (d, i) => centerLeftOffset + tableWidth / numCols * (i + 0.1))
+            // vertical center of cell box
+            .attr('y', tableHeight / numRows * (rowIndex + 0.5))
+            .text((d) => d)
+          .transition()
+            .attr('opacity', (d, i) => {
+                // if (i < 2) return 1;
+                return scrollY >= tableView.fadeTextThreshold() ? 0 : 1;
+            })
+            .each(function(d, i) {
+                tableView.buildTextMask(d, i, tableView.defs, rowIndex, className, position);
+            });
+
+        return group.selectAll('.cell-group');
     }
 
     captionOpacity(scrollY) {
@@ -156,11 +174,17 @@ export class TableView extends View {
         return scrollDiff / zeroPoint;
     }
 
-    buildGradients() {
-        const defs = this.table.append('defs');
+    fadeTextThreshold() {
+        return this.visibleHeight() * (this.dims[this.orientation()].top - 0.35);
+    }
 
+    offThreshold() {
+        return this.visibleHeight() * (this.dims[this.orientation()].top - 0.15);
+    }
+
+    buildGradients() {
         this.gradients.forEach((spec) => {
-            const gradient = defs
+            const gradient = this.defs
               .append('linearGradient')
                 .attr('id', spec.id)
                 .attr('x1', '0%')
@@ -176,5 +200,37 @@ export class TableView extends View {
                 .attr('offset', '100%')
                 .attr('stop-color', spec.stop2);
         });
+    }
+
+    buildTextMask(d, i, defs, rowIndex, className, position) {
+        if (rowIndex < 0 || i > 1) return; // skip header and anything past first two columns
+
+        const {numCols, numRows, tableWidth, tableHeight, centerLeftOffset} = position;
+
+        if (defs.select(`#${className}-mask-${rowIndex}`).empty()) {
+            defs
+              .append('mask')
+                .attr('id', `${className}-mask-${rowIndex}`)
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', '100%')
+                .attr('height', '100%')
+              .append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', '100%')
+                .attr('height', '100%')
+                .attr('fill', 'white');
+        }
+        let mask = defs.select(`#${className}-mask-${rowIndex}`);
+        if (mask.selectAll('text').filter((datum) => datum === d).empty()) {
+            mask
+              .append('text')
+                .datum(d)
+                .classed(`${className}-mask-text`, true)
+                .attr('x', centerLeftOffset + tableWidth / numCols * (i + 0.1))
+                .attr('y', tableHeight / numRows * (rowIndex + 0.5))
+                .text(d);
+        }
     }
 }
