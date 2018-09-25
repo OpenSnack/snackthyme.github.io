@@ -54,7 +54,7 @@ export class TableView extends View {
             }
         ];
 
-        this._state = 'on';
+        this._state = 'pageload';
         this.screenHeightRatio = 2;
         this.textID = 'svg-table-row';
         this.textMaskID = `${this.textID}-mask`;
