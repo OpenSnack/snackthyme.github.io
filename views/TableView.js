@@ -42,6 +42,19 @@ export class TableView extends View {
             }
         };
 
+        this.thresholds = [
+            {name: 'on', calcFunction: null},
+            {
+                name: 'fadetext',
+                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()].top - 0.35)
+            },
+            {
+                name: 'off',
+                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()].top - 0.15)
+            }
+        ];
+
+        this._state = 'on';
         this.screenHeightRatio = 2;
         this.textID = 'svg-table-row';
         this.textMaskID = `${this.textID}-mask`;
@@ -81,6 +94,7 @@ export class TableView extends View {
         if (!scrollY) {scrollY = 0;}
 
         const tableView = this;
+        const changed = this.updateState(scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(scrollY);
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
@@ -88,33 +102,40 @@ export class TableView extends View {
         const dims = this.dims[this.orientation()];
         this.table.attr('transform', `translate(0, ${dims.top * this.visibleHeight()})`);
 
-        const posParams = {
-            numCols: this.model.data.columns.length,
-            numRows: this.model.data.length,
-            tableWidth: this.svg.width() * dims.width,
-            tableHeight: this.visibleHeight() * dims.height
-        };
-        posParams.centerLeftOffset = (this.svg.width() - posParams.tableWidth) / 2;
+        if (changed || trigger === 'resize') {
+            const posParams = {
+                numCols: this.model.data.columns.length,
+                numRows: this.model.data.length,
+                tableWidth: this.svg.width() * dims.width,
+                tableHeight: this.visibleHeight() * dims.height
+            };
+            posParams.centerLeftOffset = (this.svg.width() - posParams.tableWidth) / 2;
 
-        const header = this.drawRow(this.model.data.columns, -1, 'svg-table-header', this.header, posParams);
-        header.selectAll('rect').attr('fill', 'url(#svg-table-header-gradient)');
+            const header = this.drawRow(this.model.data.columns, -1, 'svg-table-header', this.header, posParams);
+            header.selectAll('rect').attr('fill', 'url(#svg-table-header-gradient)');
 
-        // move content background into place
-        this.rows
-          .select('.svg-table-content-background')
-            .attr('x', posParams.centerLeftOffset)
-            .attr('y', 0)
-            .attr('width', posParams.tableWidth)
-            .attr('height', posParams.tableHeight)
-            .attr('fill', 'url(#svg-table-content-gradient)');
+            // move content background into place
+            this.rows
+              .select('.svg-table-content-background')
+                .attr('x', posParams.centerLeftOffset)
+                .attr('y', 0)
+                .attr('width', posParams.tableWidth)
+                .attr('height', posParams.tableHeight)
+                .attr('fill', 'url(#svg-table-content-gradient)');
 
-        // draw rows
-        this.rows.selectAll('g.row-group').each(function(d, i) {
-            let rowDict = tableView.model.data[i];
-            let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
-            // eslint-disable-next-line no-invalid-this
-            tableView.drawRow(rowData, i, tableView.textID, d3.select(this), posParams);
-        });
+            // draw rows
+            this.rows.selectAll('g.row-group').each(function(d, i) {
+                let rowDict = tableView.model.data[i];
+                let rowData = tableView.model.data.columns.map((colName) => rowDict[colName]);
+                // eslint-disable-next-line no-invalid-this
+                tableView.drawRow(rowData, i, tableView.textID, d3.select(this), posParams);
+            });
+
+            this.table
+              .transition()
+              .duration(500)
+                .attr('opacity', this._state === 'off' ? 0 : 1);
+        }
     }
 
     drawRow(data, rowIndex, className, group, position) {
