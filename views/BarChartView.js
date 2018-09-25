@@ -21,7 +21,7 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.7,
-                    top: 0.6
+                    top: 0.3
                 }
             },
             portrait: {
@@ -38,7 +38,7 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.7,
-                    top: 0.6
+                    top: 0.3
                 }
             }
         };
@@ -58,7 +58,7 @@ export class BarChartView extends View {
         this.screenHeightRatio = 1;
 
         if (params && params.maskID) {
-            this.maskID = params.maskID;
+            this.tableMaskID = params.maskID;
         }
 
         this._numBars = 5;
@@ -82,7 +82,7 @@ export class BarChartView extends View {
           .enter()
           .append('rect')
             .attr('class', 'svg-bar-chart-bar')
-            .attr('mask', (d, i) => `url(#${this.maskID}-${i})`);
+            .attr('mask', (d, i) => `url(#${this.tableMaskID}-${i})`);
 
         this.buildGradient();
 
@@ -144,7 +144,7 @@ export class BarChartView extends View {
     }
 
     chartTopPosition(scrollY) {
-        let fixedTop = this.dims[this.orientation()]['off'].top * this.visibleHeight();
+        let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
         return this._state === 'focused' ? fixedTop : fixedTop - scrollY;
     }
 
@@ -167,18 +167,18 @@ export class BarChartView extends View {
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'rgba(255,255,255, 1)');
+            .attr('stop-color', 'rgba(255,255,255, 0.8)');
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'rgba(174,76,227, 1)');
+            .attr('stop-color', 'rgba(100,200,255, 0.8)');
 
         this.gradient.append('stop')
             .attr('offset', '95%')
-            .attr('stop-color', 'rgba(174,76,227, 1)');
+            .attr('stop-color', 'rgba(100,200,255, 1)');
 
         this.gradient.append('stop')
             .attr('offset', '100%')
-            .attr('stop-color', 'rgba(174,76,227, 0)');
+            .attr('stop-color', 'rgba(100,200,255, 0)');
     }
 }
