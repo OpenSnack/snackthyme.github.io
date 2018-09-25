@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/snackthyme/snackthyme.github.io#readme",
   "dependencies": {
-    "d3": "^5.6.0"
+    "d3": "^5.6.0",
+    "each-cons": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

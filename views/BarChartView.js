@@ -43,6 +43,18 @@ export class BarChartView extends View {
             }
         };
 
+        this.thresholds = [
+            {name: 'off', calcFunction: null},
+            {
+                name: 'ontable',
+                calcFunction: (y) => this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.35)
+            },
+            {
+                name: 'focused',
+                calcFunction: (y) => this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.15)
+            }
+        ];
+
         this.screenHeightRatio = 1;
 
         if (params && params.maskID) {
@@ -100,10 +112,10 @@ export class BarChartView extends View {
 
             this.chart.selectAll('.svg-bar-chart-bar')
                 .transition()
+                .duration(500)
                 .attr('x', centerLeftOffset)
                 .attr('y', (d) => this.yScale(d.ID))
                 .attr('height', this.yScale.bandwidth())
-                .duration(500)
                 .attr('width', (d) => {
                     if (this._state === 'off') {
                         return 0;
@@ -118,31 +130,19 @@ export class BarChartView extends View {
         return this.dims[this.orientation()]['off'].top * this.visibleHeight();
     }
 
-    focusedPosition() {
-
-    }
-
-    ontableThreshold() {
-        return this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.35);
-    }
-
-    focusedThreshold() {
-        return this.svg.height() * (this.dims[this.orientation()]['off'].top - 0.15);
-    }
-
-    updateState(scrollY) {
-        let oldState = this._state;
-        let ontableThreshold = this.ontableThreshold();
-        let focusedThreshold = this.focusedThreshold();
-        if (scrollY < ontableThreshold) {
-            this._state = 'off';
-        } else if (ontableThreshold <= scrollY && scrollY < focusedThreshold) {
-            this._state = 'ontable';
-        } else {
-            this._state = 'focused';
-        }
-        return oldState !== this._state; // return true if the state changed
-    }
+    // updateState(scrollY) {
+    //     let oldState = this._state;
+    //     let ontableThreshold = this.ontableThreshold();
+    //     let focusedThreshold = this.focusedThreshold();
+    //     if (scrollY < ontableThreshold) {
+    //         this._state = 'off';
+    //     } else if (ontableThreshold <= scrollY && scrollY < focusedThreshold) {
+    //         this._state = 'ontable';
+    //     } else {
+    //         this._state = 'focused';
+    //     }
+    //     return oldState !== this._state; // return true if the state changed
+    // }
 
     barValue(d) {
         let rating = Number(d.Rating);

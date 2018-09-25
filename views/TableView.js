@@ -77,7 +77,7 @@ export class TableView extends View {
         this.update(window.scrollY);
     }
 
-    update(scrollY) {
+    update(scrollY, trigger) {
         if (!scrollY) {scrollY = 0;}
 
         const tableView = this;
