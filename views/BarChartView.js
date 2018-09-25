@@ -89,11 +89,28 @@ export class BarChartView extends View {
         this.update(window.scrollY);
     }
 
-    update(scrollY, trigger) {
+    update(trigger) {
         const view = this;
-        const changed = this.updateState(scrollY); // do things that need to know the state AFTER this
+        const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
-        this.chart.attr('transform', `translate(0, ${this.startingPosition() - scrollY})`);
+        if (changed && Object.values(changed).includes('focused')) {
+            this.chart
+                .transition()
+                .duration(500)
+                .attrTween('transform', () => {
+                    // A D V A N C E D  T A C T I C S
+                    let source = Number(this.chart.attr('transform').split(',')[1].trim().slice(0, -1));
+
+                    return (t) => {
+                        let dest = this.chartTopPosition(window.scrollY);
+                        let inter = d3.interpolate(source, dest);
+                        return `translate(0, ${inter(t)})`;
+                    };
+                });
+        } else {
+            this.chart.attr('transform', `translate(0, ${this.chartTopPosition(window.scrollY)})`);
+        }
+
         const dims = this.dims[this.orientation()][this._state];
 
         if (changed || trigger === 'resize') {
@@ -126,23 +143,10 @@ export class BarChartView extends View {
         }
     }
 
-    startingPosition() {
-        return this.dims[this.orientation()]['off'].top * this.visibleHeight();
+    chartTopPosition(scrollY) {
+        let fixedTop = this.dims[this.orientation()]['off'].top * this.visibleHeight();
+        return this._state === 'focused' ? fixedTop : fixedTop - scrollY;
     }
-
-    // updateState(scrollY) {
-    //     let oldState = this._state;
-    //     let ontableThreshold = this.ontableThreshold();
-    //     let focusedThreshold = this.focusedThreshold();
-    //     if (scrollY < ontableThreshold) {
-    //         this._state = 'off';
-    //     } else if (ontableThreshold <= scrollY && scrollY < focusedThreshold) {
-    //         this._state = 'ontable';
-    //     } else {
-    //         this._state = 'focused';
-    //     }
-    //     return oldState !== this._state; // return true if the state changed
-    // }
 
     barValue(d) {
         let rating = Number(d.Rating);

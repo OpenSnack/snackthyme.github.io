@@ -11,7 +11,7 @@ export class View {
 
     }
 
-    update(scrollY) {
+    update(trigger) {
         // do something with model data and put results into svg
     }
 
@@ -51,10 +51,13 @@ export class View {
             eachCons(thresholds, 2).some((pair) => {
                 if (pair[0].y <= scrollY && scrollY < pair[1].y) {
                     this._state = pair[0].name;
-                    return true;
+                    return {from: oldState, to: this._state};
                 }
             });
         }
-        return oldState !== this._state;
+        if (oldState !== this._state) {
+            return {from: oldState, to: this._state};
+        }
+        return false;
     }
 }

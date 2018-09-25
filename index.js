@@ -9,3 +9,4 @@ const model = new Model();
 model.load('data.csv', () => {
     window.magic = new MagicView(model, d3.select('#magic-container')).init();
 });
+window.d3 = d3;

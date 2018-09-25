@@ -87,16 +87,14 @@ export class TableView extends View {
                 .classed('row-group', true);
         });
 
-        this.update(window.scrollY);
+        this.update();
     }
 
-    update(scrollY, trigger) {
-        if (!scrollY) {scrollY = 0;}
-
+    update(trigger) {
         const tableView = this;
-        const changed = this.updateState(scrollY); // do things that need to know the state AFTER this
+        const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
-        let capOpacity = this.captionOpacity(scrollY);
+        let capOpacity = this.captionOpacity(window.scrollY);
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity}));
 
         const dims = this.dims[this.orientation()];
@@ -134,6 +132,11 @@ export class TableView extends View {
             this.table
               .transition()
               .duration(500)
+                .attr('opacity', this._state === 'off' ? 0 : 1);
+
+            this.table.selectAll('mask text')
+              .transition()
+              .duration(300)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
         }
     }
@@ -178,7 +181,7 @@ export class TableView extends View {
           .transition()
             .attr('opacity', (d, i) => {
                 // if (i < 2) return 1;
-                return scrollY >= tableView.fadeTextThreshold() ? 0 : 1;
+                return window.scrollY >= tableView.fadeTextThreshold() ? 0 : 1;
             })
             .each(function(d, i) {
                 tableView.buildTextMask(d, i, tableView.defs, rowIndex, className, position);

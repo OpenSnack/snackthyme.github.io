@@ -49,7 +49,7 @@ export class MagicView {
     refreshViews(trigger) {
         this.views.forEach((view) => {
             view.setHeight(window.innerHeight);
-            view.update(window.scrollY, trigger);
+            view.update(trigger);
         });
     }
 
