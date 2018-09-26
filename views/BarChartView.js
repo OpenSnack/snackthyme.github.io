@@ -81,10 +81,10 @@ export class BarChartView extends View {
           .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
           .append('rect')
-            .attr('class', 'svg-bar-chart-bar')
-            .attr('mask', (d, i) => `url(#${this.tableMaskID}-${i})`);
+            .attr('class', 'svg-bar-chart-bar');
 
         this.buildGradient();
+        this.buildTextMasks();
 
         this.update(window.scrollY);
     }
@@ -97,9 +97,11 @@ export class BarChartView extends View {
             this.chart
                 .transition()
                 .duration(500)
+                // A D V A N C E D  T A C T I C S
+                // This tween checks the scroll position on each time tick to ensure that the chart ends
+                // up in the right place regardless of where we started from or where we scrolled to.
                 .attrTween('transform', () => {
-                    // A D V A N C E D  T A C T I C S
-                    let source = Number(this.chart.attr('transform').split(',')[1].trim().slice(0, -1));
+                    let source = Number(this.chart.attr('transform').split(',')[1].slice(1, -1));
 
                     return (t) => {
                         let dest = this.chartTopPosition(window.scrollY);
@@ -113,24 +115,30 @@ export class BarChartView extends View {
 
         const dims = this.dims[this.orientation()][this._state];
 
-        if (changed || trigger === 'resize') {
-            const chartWidth = this.svg.width() * dims.width;
-            const chartHeight = this.svg.height() * dims.height;
-            const centerLeftOffset = (this.svg.width() - chartWidth) / 2;
-            const barRight = centerLeftOffset + chartWidth;
+        const posParams = {
+            chartWidth: this.svg.width() * dims.width,
+            chartHeight: this.svg.height() * dims.height,
+        };
+        posParams.centerLeftOffset = (this.svg.width() - posParams.chartWidth) / 2;
+        posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
 
-            this.xScale.rangeRound([0, chartWidth]);
-            this.yScale.range([0, chartHeight])
+        let bars = this.chart.selectAll('.svg-bar-chart-bar');
+
+        if (changed || trigger === 'resize') {
+            this.xScale.rangeRound([0, posParams.chartWidth]);
+            this.yScale.range([0, posParams.chartHeight])
                 .padding(this._state === 'focused' ? 0.05 : 0);
 
             this.gradient
-                .attr('x1', centerLeftOffset)
-                .attr('x2', barRight);
+                .attr('x1', posParams.centerLeftOffset)
+                .attr('x2', posParams.barRight);
 
-            this.chart.selectAll('.svg-bar-chart-bar')
-                .transition()
-                .duration(500)
-                .attr('x', centerLeftOffset)
+            // on resize, just move right away
+            if (trigger !== 'resize') {
+                bars = bars.transition().duration(500);
+            }
+
+            bars.attr('x', posParams.centerLeftOffset)
                 .attr('y', (d) => this.yScale(d.ID))
                 .attr('height', this.yScale.bandwidth())
                 .attr('width', (d) => {
@@ -141,6 +149,78 @@ export class BarChartView extends View {
                 })
                 .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
         }
+
+        // move masks around
+        // if changed:
+        //      if 'focused':
+        //          move bar masks into place
+        //          (fade out table masks) [handled by TableView]
+        //              DELAY ---> set bar masks
+        //                         fade in bar masks
+        //      if 'ontable':
+        //          fade out bar masks
+        //              END ---> set table masks
+        //              DELAY ---> (fade in table masks) [handled by TableView]
+        // else if resize:
+        //      if 'focused':
+        //          move bar masks into place
+        // else if slider move:
+        //      move bar masks into place
+
+        let nameMasks = this.chart.selectAll('.svg-bar-chart-mask-name');
+        let ratingMasks = this.chart.selectAll('.svg-bar-chart-mask-rating');
+        if (changed) {
+            if (this._state === 'focused') {
+                this.moveBarMasks(nameMasks, ratingMasks, posParams);
+                // table masks fade out during this time
+                bars.transition()
+                    .duration(500)
+                    .attr('mask', (d, i) => `url(#svg-bar-chart-mask-${i})`);
+                nameMasks
+                    .transition()
+                    .delay(500)
+                    .duration(500)
+                    .attr('opacity', 1);
+                ratingMasks
+                    .transition()
+                    .delay(500)
+                    .duration(500)
+                    .attr('opacity', 1);
+            } else if (this._state === 'ontable') {
+                nameMasks
+                    .transition()
+                    .duration(500)
+                    .attr('opacity', 0);
+                ratingMasks
+                    .transition()
+                    .duration(500)
+                    .attr('opacity', 0)
+                    .on('end', () => {
+                        this.chart
+                          .selectAll('.svg-bar-chart-bar')
+                            .attr('mask', (d, i) => `url(#${view.tableMaskID}-${i})`);
+                    });
+                // table masks fade in during this time
+            }
+        } else if (trigger === 'resize' && this._state === 'focused') {
+            this.moveBarMasks(nameMasks, ratingMasks, posParams);
+        } else if (trigger === 'sliderMoved') {
+            this.moveBarMasks(nameMasks, ratingMasks, posParams);
+        }
+
+        // HANDLE RESIZE FOR TABLE MASKS
+    }
+
+    moveBarMasks(nameMasks, ratingMasks, position) {
+        const {centerLeftOffset} = position;
+        let innerPadding = this.yScale.bandwidth() / 4;
+
+        nameMasks
+            .attr('x', centerLeftOffset + innerPadding)
+            .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
+        ratingMasks
+            .attr('x', (d) => centerLeftOffset + this.xScale(this.barValue(d)) - innerPadding)
+            .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
     }
 
     chartTopPosition(scrollY) {
@@ -180,5 +260,40 @@ export class BarChartView extends View {
         this.gradient.append('stop')
             .attr('offset', '100%')
             .attr('stop-color', 'rgba(100,200,255, 0)');
+    }
+
+    buildTextMasks() {
+        const defs = this.chart.select('defs');
+
+        this.model.data.forEach((d, i) => {
+            defs
+              .append('mask')
+                .attr('id', `svg-bar-chart-mask-${i}`)
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', '100%')
+                .attr('height', '100%')
+              .append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', '100%')
+                .attr('height', '100%')
+                .attr('fill', 'white');
+
+            let mask = defs.select(`#svg-bar-chart-mask-${i}`);
+            // username
+            mask
+              .append('text')
+                .datum(d)
+                .classed('svg-bar-chart-mask-name', true)
+                .text(d.User);
+            // moving rating
+            mask
+              .append('text')
+                .datum(d)
+                .classed('svg-bar-chart-mask-rating', true)
+                .text(d.Rating);
+        });
+        // update x and y position elsewhere
     }
 }

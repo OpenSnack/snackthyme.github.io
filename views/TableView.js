@@ -133,11 +133,22 @@ export class TableView extends View {
               .transition()
               .duration(500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
+        }
 
-            this.table.selectAll('mask text')
-              .transition()
-              .duration(300)
-                .attr('opacity', this._state === 'off' ? 0 : 1);
+        // fade masks in and out based on state
+        if (changed) {
+            if (this._state === 'off') {
+                tableView.defs.selectAll('mask text')
+                    .transition()
+                    .duration(500)
+                    .attr('opacity', 0);
+            } else {
+                tableView.defs.selectAll('mask text')
+                    .transition()
+                    .delay(500)
+                    .duration(500)
+                    .attr('opacity', 1);
+            }
         }
     }
 

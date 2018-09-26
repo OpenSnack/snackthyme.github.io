@@ -3,3 +3,14 @@
     top: 0;
     left: 0;
 }
+
+.svg-bar-chart-mask-name,
+.svg-bar-chart-mask-rating {
+    alignment-baseline: middle;
+    font-weight: 400;
+    font-size: 1.5em;
+}
+
+.svg-bar-chart-mask-rating {
+    text-anchor: end;
+}
