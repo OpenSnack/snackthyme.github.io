@@ -3,9 +3,8 @@ import {csv} from 'd3';
 export class Model {
     constructor() {
         this._observers = [];
-        this.data = null;
-        this._numViews = 0;
-        this.viewIndex = 0;
+        this.data = [];
+        this._sliderValue = 0;
     }
 
     load(filename, callback) {
@@ -20,10 +19,24 @@ export class Model {
     }
 
     notify(params) {
-        this._observers.forEach((view) => {view.update(params);});
+        this._observers.forEach((obs) => {obs.update(params || {});});
     }
 
-    setNumViews(num) {
-        this._numViews = num;
+    setSliderValue(value) {
+        this._sliderValue = value;
+        this.notify({trigger: 'sliderMoved'});
+    }
+
+    currentData() {
+        return this.data.map((rowDict) => {
+            let rating = this.currentRating(rowDict);
+            return Object.assign(rowDict, {currentRating: rating});
+        });
+    }
+
+    currentRating(d) {
+        let rating = Number(d.Rating);
+        let ratio = Number(d.Ratio);
+        return rating + this._sliderValue * rating * ratio;
     }
 }

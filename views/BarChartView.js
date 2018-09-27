@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class BarChartView extends View {
-    constructor(model, svg, parent, params) {
-        super(model, svg, parent);
+    constructor(model, container, parent, params) {
+        super(model, container, parent);
 
         this.dims = {
             landscape: {
@@ -70,9 +70,9 @@ export class BarChartView extends View {
 
     init(callback) {
         const dims = this.dims[this.orientation()][this._state];
-        this.chart = this.svg
+        this.chart = this.container
           .append('g')
-            .attr('transform', `translate(0, ${dims.top * this.svg.height()})`);
+            .attr('transform', `translate(0, ${dims.top * this.container.height()})`);
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
@@ -86,7 +86,7 @@ export class BarChartView extends View {
         this.buildGradient();
         this.buildTextMasks();
 
-        this.update(window.scrollY);
+        this.update();
     }
 
     update(trigger) {
@@ -116,39 +116,41 @@ export class BarChartView extends View {
         const dims = this.dims[this.orientation()][this._state];
 
         const posParams = {
-            chartWidth: this.svg.width() * dims.width,
-            chartHeight: this.svg.height() * dims.height,
+            chartWidth: this.container.width() * dims.width,
+            chartHeight: this.container.height() * dims.height,
         };
-        posParams.centerLeftOffset = (this.svg.width() - posParams.chartWidth) / 2;
+        posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
 
-        let bars = this.chart.selectAll('.svg-bar-chart-bar');
+        let bars = this.chart
+          .selectAll('.svg-bar-chart-bar')
+          .data(this.model.currentData());
 
-        if (changed || trigger === 'resize') {
-            this.xScale.rangeRound([0, posParams.chartWidth]);
-            this.yScale.range([0, posParams.chartHeight])
-                .padding(this._state === 'focused' ? 0.05 : 0);
+        this.xScale.rangeRound([0, posParams.chartWidth]);
+        this.yScale.range([0, posParams.chartHeight])
+            .padding(this._state === 'focused' ? 0.05 : 0);
 
-            this.gradient
-                .attr('x1', posParams.centerLeftOffset)
-                .attr('x2', posParams.barRight);
+        this.gradient
+            .attr('x1', posParams.centerLeftOffset)
+            .attr('x2', posParams.barRight);
 
-            // on resize, just move right away
-            if (trigger !== 'resize') {
-                bars = bars.transition().duration(500);
-            }
-
-            bars.attr('x', posParams.centerLeftOffset)
-                .attr('y', (d) => this.yScale(d.ID))
-                .attr('height', this.yScale.bandwidth())
-                .attr('width', (d) => {
-                    if (this._state === 'off') {
-                        return 0;
-                    }
-                    return this.xScale(this.barValue(d));
-                })
-                .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
+        // on resize, just move right away
+        if (trigger !== 'resize') {
+            bars = bars.transition().duration(500);
         }
+
+        bars.attr('x', posParams.centerLeftOffset)
+            .attr('y', (d) => this.yScale(d.ID))
+            .attr('height', this.yScale.bandwidth())
+            .attr('width', (d) => {
+                if (this._state === 'off') {
+                    return 0;
+                } else if (this._state === 'ontable') {
+                    return this.xScale(d.Rating);
+                }
+                return this.xScale(d.currentRating);
+            })
+            .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
 
         // move masks around
         // if changed:
@@ -171,16 +173,18 @@ export class BarChartView extends View {
         let ratingMasks = this.chart.selectAll('.svg-bar-chart-mask-rating');
         if (changed) {
             if (this._state === 'focused') {
-                this.moveBarMasks(nameMasks, ratingMasks, posParams);
+                this.moveBarMasks(nameMasks, ratingMasks, posParams, true);
                 // table masks fade out during this time
-                bars.transition()
-                    .duration(500)
-                    .attr('mask', (d, i) => `url(#svg-bar-chart-mask-${i})`);
                 nameMasks
                     .transition()
                     .delay(500)
                     .duration(500)
-                    .attr('opacity', 1);
+                    .attr('opacity', 1)
+                    .on('start', () => {
+                        this.chart
+                          .selectAll('.svg-bar-chart-bar')
+                            .attr('mask', (d, i) => `url(#svg-bar-chart-mask-${i})`);
+                    });
                 ratingMasks
                     .transition()
                     .delay(500)
@@ -205,33 +209,44 @@ export class BarChartView extends View {
         } else if (trigger === 'resize' && this._state === 'focused') {
             this.moveBarMasks(nameMasks, ratingMasks, posParams);
         } else if (trigger === 'sliderMoved') {
-            this.moveBarMasks(nameMasks, ratingMasks, posParams);
+            this.moveBarMasks(nameMasks, ratingMasks, posParams, true);
         }
 
         // HANDLE RESIZE FOR TABLE MASKS
     }
 
-    moveBarMasks(nameMasks, ratingMasks, position) {
+    moveBarMasks(nameMasks, ratingMasks, position, transition) {
         const {centerLeftOffset} = position;
         let innerPadding = this.yScale.bandwidth() / 4;
 
         nameMasks
+            .data(this.model.currentData())
             .attr('x', centerLeftOffset + innerPadding)
-            .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
+            .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2)
+            .text((d) => d.User);
+
+        if (transition === true) {
+            ratingMasks = ratingMasks
+              .data(this.model.currentData())
+              .transition()
+              .duration(500)
+                .tween('text', function(d) {
+                    // make rating number count up/down when value changes
+                    let oldValue = this.textContent; // eslint-disable-line no-invalid-this
+                    let inter = d3.interpolateRound(Number(oldValue), d.currentRating);
+                    return (t) => {this.textContent = inter(t);}; // eslint-disable-line no-invalid-this
+                });
+        } else {
+            ratingMasks.text((d) => d.currentRating);
+        }
         ratingMasks
-            .attr('x', (d) => centerLeftOffset + this.xScale(this.barValue(d)) - innerPadding)
+            .attr('x', (d) => centerLeftOffset + this.xScale(d.currentRating) - innerPadding)
             .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
     }
 
     chartTopPosition(scrollY) {
         let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
         return this._state === 'focused' ? fixedTop : fixedTop - scrollY;
-    }
-
-    barValue(d) {
-        let rating = Number(d.Rating);
-        let ratio = Number(d.Ratio);
-        return rating + this._sliderValue * rating * ratio;
     }
 
     buildGradient() {
@@ -284,16 +299,12 @@ export class BarChartView extends View {
             // username
             mask
               .append('text')
-                .datum(d)
-                .classed('svg-bar-chart-mask-name', true)
-                .text(d.User);
+                .classed('svg-bar-chart-mask-name', true);
             // moving rating
             mask
               .append('text')
-                .datum(d)
-                .classed('svg-bar-chart-mask-rating', true)
-                .text(d.Rating);
+                .classed('svg-bar-chart-mask-rating', true);
         });
-        // update x and y position elsewhere
+        // update value, x and y position elsewhere
     }
 }

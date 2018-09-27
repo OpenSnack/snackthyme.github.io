@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class TableView extends View {
-    constructor(model, svg, parent) {
-        super(model, svg, parent);
+    constructor(model, container, parent) {
+        super(model, container, parent);
 
         this.dims = {
             landscape: {
@@ -63,7 +63,7 @@ export class TableView extends View {
     init(callback) {
         const dims = this.dims[this.orientation()];
 
-        this.table = this.svg
+        this.table = this.container
           .append('g')
             .attr('id', 'svg-table');
 
@@ -104,10 +104,10 @@ export class TableView extends View {
             const posParams = {
                 numCols: this.model.data.columns.length,
                 numRows: this.model.data.length,
-                tableWidth: this.svg.width() * dims.width,
+                tableWidth: this.container.width() * dims.width,
                 tableHeight: this.visibleHeight() * dims.height
             };
-            posParams.centerLeftOffset = (this.svg.width() - posParams.tableWidth) / 2;
+            posParams.centerLeftOffset = (this.container.width() - posParams.tableWidth) / 2;
 
             const header = this.drawRow(this.model.data.columns, -1, 'svg-table-header', this.header, posParams);
             header.selectAll('rect').attr('fill', 'url(#svg-table-header-gradient)');

@@ -4,6 +4,7 @@ import {MultiChartView} from './MultiChartView';
 import {TableView} from './TableView';
 import {BarChartView} from './BarChartView';
 import {MapView} from './MapView';
+import {SliderView} from './SliderView';
 
 export class MagicView {
     constructor(model, container) {
@@ -16,21 +17,24 @@ export class MagicView {
 
         const tableSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-1'));
         this.tableView = new TableView(model, tableSVG, this);
+
         const barChartSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-2'));
         this.barChartView = new BarChartView(model, barChartSVG, this, {'maskID': this.tableView.textMaskID});
+
         const mapMultiSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
         this.mapView = new MapView(model, mapMultiSVG, this);
         this.multiChartView = new MultiChartView(model, mapMultiSVG, this);
+
+        const sliderDiv = this.viewify(this.container.append('div').attr('id', 'slider'));
+        this.sliderView = new SliderView(model, sliderDiv);
 
         this.views = [
             this.tableView,
             this.barChartView,
             this.mapView,
-            this.multiChartView
+            this.multiChartView,
+            this.sliderView
         ];
-
-        this.model.setNumViews(this.views.length);
-        this._currentView = 0;
     }
 
     init() {
@@ -44,6 +48,10 @@ export class MagicView {
         window.addEventListener('resize', () => this.refreshViews('resize'));
         window.addEventListener('scroll', () => this.refreshViews('scroll'));
         return this;
+    }
+
+    update(params) {
+        this.refreshViews(params.trigger);
     }
 
     refreshViews(trigger) {

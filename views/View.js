@@ -1,10 +1,11 @@
 import * as eachCons from 'each-cons';
 
 export class View {
-    constructor(model, svg, parent) {
+    constructor(model, container, parent) {
         this.model = model;
-        this.svg = svg;
+        this.container = container;
         this.parent = parent;
+        this.screenHeightRatio = 1; // feel free to change
     }
 
     init(callback) {
@@ -16,11 +17,11 @@ export class View {
     }
 
     setHeight(screenHeight) {
-        this.svg.attr('height', screenHeight * this.screenHeightRatio);
+        this.container.attr('height', screenHeight * this.screenHeightRatio);
     }
 
     visibleHeight() {
-        return this.svg.height() / this.screenHeightRatio;
+        return this.container.height() / this.screenHeightRatio;
     }
 
     orientation() {
