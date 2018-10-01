@@ -46,6 +46,8 @@ export class View {
 
         if (scrollY < thresholds[0].y) {
             this._state = this.thresholds[0].name;
+        } else if (thresholds.length === 1) {
+            this._state = thresholds[0].name;
         } else if (scrollY > thresholds[1].y) {
             this._state = thresholds[1].name;
         } else {
