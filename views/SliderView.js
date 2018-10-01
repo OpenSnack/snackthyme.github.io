@@ -58,10 +58,10 @@ export class SliderView extends View {
 
         if (changed) {
             this.container
+                .attr('disabled', this._state === 'off' ? true : null)
                 .transition()
                 .duration(500)
-                .style('opacity', this._state === 'off' ? 0 : 1)
-                .attr('disabled', this._state === 'off' ? true : null);
+                .style('opacity', this._state === 'off' ? 0 : 1);
         }
     }
 }

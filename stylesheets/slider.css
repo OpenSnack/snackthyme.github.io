@@ -3,4 +3,11 @@
     top: 0;
     left: 0;
     z-index: 998;
+    opacity: 0;
+}
+
+[disabled].noUi-target,
+[disabled].noUi-handle,
+[disabled] .noUi-handle {
+  cursor: default !important;
 }
