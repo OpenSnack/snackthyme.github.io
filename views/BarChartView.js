@@ -104,7 +104,7 @@ export class BarChartView extends View {
 
     update(params) {
         const view = this;
-        const {trigger, immediately} = params;
+        const {trigger} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(window.scrollY);
@@ -152,25 +152,18 @@ export class BarChartView extends View {
             .attr('x2', posParams.barRight);
 
         // on resize, just move right away
-        if (trigger !== 'resize' && !immediately) {
-            bars = bars.transition().duration(500);
-            if (trigger === 'sliderMoved') {
-                bars = bars.ease(d3.easeCubicOut);
+        if (trigger !== 'resize') {
+            if (changed) {
+                bars = bars.transition().duration(500);
+                if (trigger === 'sliderMoved') {
+                    bars = bars.ease(d3.easeCubicOut);
+                }
             }
+            this.moveBars(bars, posParams);
+        } else {
+            this.moveBars(bars, posParams);
         }
 
-        bars.attr('x', posParams.centerLeftOffset)
-            .attr('y', (d) => this.yScale(d.ID))
-            .attr('height', this.yScale.bandwidth())
-            .attr('width', (d) => {
-                if (this._state === 'off') {
-                    return 0;
-                } else if (this._state === 'ontable') {
-                    return this.xScale(d.Rating);
-                }
-                return this.xScale(d.currentRating);
-            })
-            .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
 
         // move masks around
         // if changed:
@@ -226,13 +219,28 @@ export class BarChartView extends View {
                     });
                 // table masks fade in during this time
             }
-        } else if ((trigger === 'resize' && this._state === 'focused') || immediately) {
+        } else if (trigger === 'resize' && this._state === 'focused') {
             this.moveBarMasks(nameMasks, ratingMasks, posParams);
         } else if (trigger === 'sliderMoved') {
             this.moveBarMasks(nameMasks, ratingMasks, posParams, {ease: d3.easeCubicOut});
         }
 
         // HANDLE RESIZE FOR TABLE MASKS
+    }
+
+    moveBars(bars, posParams) {
+        bars.attr('x', posParams.centerLeftOffset)
+        .attr('y', (d) => this.yScale(d.ID))
+        .attr('height', this.yScale.bandwidth())
+        .attr('width', (d) => {
+            if (this._state === 'off') {
+                return 0;
+            } else if (this._state === 'ontable') {
+                return this.xScale(d.Rating);
+            }
+            return this.xScale(d.currentRating);
+        })
+        .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
     }
 
     moveBarMasks(nameMasks, ratingMasks, position, transition) {
