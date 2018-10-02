@@ -28,20 +28,29 @@ export class SliderView extends View {
             }
         ];
 
+        this.minimum = -100;
+        this.maximum = 100;
+        this.sliderMult = 0.01;
         this._state = 'off';
     }
 
     init(callback) {
         this.slider = noUiSlider.create(this.container.node(), {
             start: [0],
+            connect: [true, false],
             range: {
-                'min': -1,
-                'max': 1
+                min: this.minimum,
+                max: this.maximum
+            },
+            pips: {
+                mode: 'steps',
+                stepped: true,
+                density: 4
             }
         });
 
         this.slider.on('update', () => {
-            this.model.setSliderValue(this.slider.get());
+            this.model.setSliderValue(this.slider.get() * this.sliderMult);
         });
 
         this.update({});
@@ -61,6 +70,10 @@ export class SliderView extends View {
             .style('top', sliderTop)
             .style('width', sliderWidth);
 
+        d3.select(this.slider.target)
+          .select('.noUi-connect')
+            .style('background-image', this.getConnectGradient());
+
         if (changed) {
             this.container
                 .attr('disabled', this._state === 'off' ? true : null)
@@ -68,5 +81,13 @@ export class SliderView extends View {
                 .duration(500)
                 .style('opacity', this._state === 'off' ? 0 : 1);
         }
+    }
+
+    getConnectGradient() {
+        let sliderValue = this.slider.get();
+        let inter = d3.interpolateRgb('rgba(255, 255, 255, 0.6)', 'rgba(134, 0, 216, 0.6)');
+        let interPurple = inter((this.slider.get() - this.minimum) / (this.maximum - this.minimum));
+
+        return `linear-gradient(to right, rgba(255, 255, 255, 0.6), ${interPurple})`;
     }
 }

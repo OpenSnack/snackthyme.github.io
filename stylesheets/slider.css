@@ -6,8 +6,75 @@
     opacity: 0;
 }
 
+.noUi-target {
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: none;
+    border: none;
+}
+
+.noUi-handle {
+    box-shadow: none;
+    cursor: grab;
+}
+
+.noUi-handle:focus {
+    outline: none;
+}
+
+.noUi-handle:active {
+    cursor: grabbing;
+}
+
+.noUi-handle::before,
+.noUi-handle::after {
+    background: white;
+}
+
+.noUi-value {
+    color: white;
+    top: 15px;
+}
+
+.noUi-marker.noUi-marker-horizontal {
+    color: white;
+    background: white;
+    opacity: 0.6;
+}
+
 [disabled].noUi-target,
 [disabled].noUi-handle,
 [disabled] .noUi-handle {
-  cursor: default !important;
+  cursor: default;
+}
+
+@media screen and (min-width: 1921px) {
+    .noUi-target {
+        height: 36px;
+    }
+
+    .noUi-horizontal .noUi-handle {
+        height: 46px;
+        width: 56px;
+        right: -28px;
+    }
+
+    .noUi-value {
+        font-size: 1.5em;
+    }
+}
+
+@media screen and (min-width: 2561px) {
+    .noUi-target {
+        height: 48px;
+    }
+
+    .noUi-horizontal .noUi-handle {
+        height: 58px;
+        width: 70px;
+        right: -35px;
+    }
+
+    .noUi-value {
+        font-size: 2em;
+    }
 }
