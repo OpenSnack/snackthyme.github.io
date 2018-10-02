@@ -45,19 +45,15 @@ export class MagicView {
             view.init();
         });
 
-        window.addEventListener('resize', () => this.refreshViews('resize'));
-        window.addEventListener('scroll', () => this.refreshViews('scroll'));
+        window.addEventListener('resize', () => this.update({trigger: 'resize'}));
+        window.addEventListener('scroll', () => this.update({trigger: 'scroll'}));
         return this;
     }
 
     update(params) {
-        this.refreshViews(params.trigger);
-    }
-
-    refreshViews(trigger) {
         this.views.forEach((view) => {
             view.setHeight(window.innerHeight);
-            view.update(trigger);
+            view.update(params);
         });
     }
 

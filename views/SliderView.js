@@ -32,18 +32,32 @@ export class SliderView extends View {
     }
 
     init(callback) {
-        noUiSlider.create(this.container.node(), {
+        this.slider = noUiSlider.create(this.container.node(), {
             start: [0],
             range: {
-                'min': -100,
-                'max': 100
+                'min': -1,
+                'max': 1
             }
         });
 
-        this.update();
+        // immediately: dragging
+        // transition: tapping
+
+        // this.slider.on('start', () => {
+        //     this.slider.on('slide', () => {
+        //         this.model.setSliderValueImmediately(this.slider.get());
+        //     });
+        // });
+
+        this.slider.on('update', () => {
+            this.model.setSliderValue(this.slider.get());
+        });
+
+        this.update({});
     }
 
-    update(trigger) {
+    update(params) {
+        const {trigger} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
         const dims = this.dims[this.orientation()];
 

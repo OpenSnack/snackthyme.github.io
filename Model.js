@@ -24,7 +24,12 @@ export class Model {
 
     setSliderValue(value) {
         this._sliderValue = value;
-        this.notify({trigger: 'sliderMoved'});
+        this.notify({trigger: 'sliderMoved', immediately: false});
+    }
+
+    setSliderValueImmediately(value) {
+        this._sliderValue = value;
+        this.notify({trigger: 'sliderMoved', immediately: true});
     }
 
     currentData() {

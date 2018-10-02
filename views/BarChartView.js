@@ -86,11 +86,12 @@ export class BarChartView extends View {
         this.buildGradient();
         this.buildTextMasks();
 
-        this.update();
+        this.update({});
     }
 
-    update(trigger) {
+    update(params) {
         const view = this;
+        const {trigger, immediately} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         if (changed && Object.values(changed).includes('focused')) {
@@ -135,8 +136,11 @@ export class BarChartView extends View {
             .attr('x2', posParams.barRight);
 
         // on resize, just move right away
-        if (trigger !== 'resize') {
+        if (trigger !== 'resize' && !immediately) {
             bars = bars.transition().duration(500);
+            if (trigger === 'sliderMoved') {
+                bars = bars.ease(d3.easeCubicOut);
+            }
         }
 
         bars.attr('x', posParams.centerLeftOffset)
@@ -206,10 +210,10 @@ export class BarChartView extends View {
                     });
                 // table masks fade in during this time
             }
-        } else if (trigger === 'resize' && this._state === 'focused') {
+        } else if ((trigger === 'resize' && this._state === 'focused') || immediately) {
             this.moveBarMasks(nameMasks, ratingMasks, posParams);
         } else if (trigger === 'sliderMoved') {
-            this.moveBarMasks(nameMasks, ratingMasks, posParams, true);
+            this.moveBarMasks(nameMasks, ratingMasks, posParams, {ease: d3.easeCubicOut});
         }
 
         // HANDLE RESIZE FOR TABLE MASKS
@@ -225,11 +229,12 @@ export class BarChartView extends View {
             .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2)
             .text((d) => d.User);
 
-        if (transition === true) {
+        if (transition) {
             ratingMasks = ratingMasks
               .data(this.model.currentData())
               .transition()
               .duration(500)
+              .ease(transition.ease || d3.easeCubic)
                 .tween('text', function(d) {
                     // make rating number count up/down when value changes
                     let oldValue = this.textContent; // eslint-disable-line no-invalid-this
@@ -237,7 +242,7 @@ export class BarChartView extends View {
                     return (t) => {this.textContent = inter(t);}; // eslint-disable-line no-invalid-this
                 });
         } else {
-            ratingMasks.text((d) => d.currentRating);
+            ratingMasks.text((d) => Math.round(d.currentRating));
         }
         ratingMasks
             .attr('x', (d) => centerLeftOffset + this.xScale(d.currentRating) - innerPadding)

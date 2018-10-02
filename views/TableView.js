@@ -87,11 +87,12 @@ export class TableView extends View {
                 .classed('row-group', true);
         });
 
-        this.update();
+        this.update({});
     }
 
-    update(trigger) {
+    update(params) {
         const tableView = this;
+        const {trigger} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(window.scrollY);

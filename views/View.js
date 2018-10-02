@@ -12,7 +12,7 @@ export class View {
 
     }
 
-    update(trigger) {
+    update(params) {
         // do something with model data and put results into svg
     }
 
