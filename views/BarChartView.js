@@ -153,7 +153,7 @@ export class BarChartView extends View {
 
         // on resize, just move right away
         if (trigger !== 'resize') {
-            if (changed) {
+            if (changed || trigger === 'sliderMoved') {
                 bars = bars.transition().duration(500);
                 if (trigger === 'sliderMoved') {
                     bars = bars.ease(d3.easeCubicOut);
