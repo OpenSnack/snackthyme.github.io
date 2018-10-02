@@ -40,15 +40,6 @@ export class SliderView extends View {
             }
         });
 
-        // immediately: dragging
-        // transition: tapping
-
-        // this.slider.on('start', () => {
-        //     this.slider.on('slide', () => {
-        //         this.model.setSliderValueImmediately(this.slider.get());
-        //     });
-        // });
-
         this.slider.on('update', () => {
             this.model.setSliderValue(this.slider.get());
         });

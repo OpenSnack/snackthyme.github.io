@@ -21,7 +21,7 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.7,
-                    top: 0.3
+                    top: 0.35
                 }
             },
             portrait: {
@@ -38,7 +38,7 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.7,
-                    top: 0.3
+                    top: 0.35
                 }
             }
         };
@@ -54,6 +54,15 @@ export class BarChartView extends View {
                 calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.15)
             }
         ];
+
+        this._captionParams = {
+            text: 'What if you could breathe life into your data?',
+            coords: {
+                width: 0.7,
+                top: 0.15,
+                left: 0.15
+            }
+        };
 
         this.screenHeightRatio = 1;
 
@@ -77,6 +86,10 @@ export class BarChartView extends View {
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
 
+        this.caption = this.parent.container
+          .append('span')
+            .classed('caption', true);
+
         this.chart.selectAll('.svg-bar-chart-bar')
           .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
@@ -93,6 +106,9 @@ export class BarChartView extends View {
         const view = this;
         const {trigger, immediately} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
+
+        let capOpacity = this.captionOpacity(window.scrollY);
+        this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity, transition: changed}));
 
         if (changed && Object.values(changed).includes('focused')) {
             this.chart
@@ -252,6 +268,14 @@ export class BarChartView extends View {
     chartTopPosition(scrollY) {
         let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
         return this._state === 'focused' ? fixedTop : fixedTop - scrollY;
+    }
+
+    captionOpacity(scrollY) {
+        let onPoint = this.thresholds[2].calcFunction(); // focused
+        let scrollOnDiff = scrollY - onPoint;
+        if (scrollOnDiff < 0) return 0;
+        // eventually add caption fade out here
+        return 1;
     }
 
     buildGradient() {

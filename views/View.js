@@ -33,8 +33,18 @@ export class View {
             .style('width', params.coords.width * window.innerWidth + 'px')
             .style('top', params.coords.top * window.innerHeight + 'px')
             .style('left', params.coords.left * window.innerWidth + 'px')
-            .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1)
             .text(params.text);
+
+        if (params.transition) {
+            this.caption
+              .transition()
+              .duration(500)
+              .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
+        } else {
+            this.caption
+            .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
+        }
+
     }
 
     updateState(scrollY) {
