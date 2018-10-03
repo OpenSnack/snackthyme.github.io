@@ -94,7 +94,8 @@ export class BarChartView extends View {
           .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
           .append('rect')
-            .attr('class', 'svg-bar-chart-bar');
+            .attr('class', 'svg-bar-chart-bar')
+            .attr('mask', (d, i) => `url(#${this.tableMaskID}-${i})`);
 
         this.buildGradient();
         this.buildTextMasks();
