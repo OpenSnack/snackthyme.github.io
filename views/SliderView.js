@@ -25,6 +25,10 @@ export class SliderView extends View {
             {
                 name: 'focused',
                 calcFunction: (y) => window.innerHeight * (this.dims[this.orientation()].scrollTop - 0.15)
+            },
+            {
+                name: 'done',
+                calcFunction: (y) => window.innerHeight * this.dims[this.orientation()].scrollTop
             }
         ];
 
@@ -76,10 +80,10 @@ export class SliderView extends View {
 
         if (changed) {
             this.container
-                .attr('disabled', this._state === 'off' ? true : null)
+                .attr('disabled', this._state !== 'focused' ? true : null)
                 .transition()
                 .duration(500)
-                .style('opacity', this._state === 'off' ? 0 : 1);
+                .style('opacity', this._state !== 'focused' ? 0 : 1);
         }
     }
 

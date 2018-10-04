@@ -5,6 +5,7 @@ export class Model {
         this._observers = [];
         this.data = [];
         this._sliderValue = 0;
+        this.selectedIndex = 0;
     }
 
     loadData(csvFile, jsonFile, callback) {

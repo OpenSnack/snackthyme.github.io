@@ -22,6 +22,11 @@ export class BarChartView extends View {
                     width: 0.7,
                     height: 0.7,
                     top: 0.35
+                },
+                faded: {
+                    width: 0.7,
+                    height: 0.7,
+                    top: 0.35
                 }
             },
             portrait: {
@@ -39,6 +44,11 @@ export class BarChartView extends View {
                     width: 0.9,
                     height: 0.7,
                     top: 0.35
+                },
+                faded: {
+                    width: 0.9,
+                    height: 0.7,
+                    top: 0.35
                 }
             }
         };
@@ -52,6 +62,10 @@ export class BarChartView extends View {
             {
                 name: 'focused',
                 calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.15)
+            },
+            {
+                name: 'faded',
+                calcFunction: (y) => this.visibleHeight() * this.dims[this.orientation()]['off'].top
             }
         ];
 
@@ -146,7 +160,7 @@ export class BarChartView extends View {
 
         this.xScale.rangeRound([0, posParams.chartWidth]);
         this.yScale.range([0, posParams.chartHeight])
-            .padding(this._state === 'focused' ? 0.05 : 0);
+            .padding(['focused', 'faded', 'done'].includes(this._state) ? 0.05 : 0);
 
         this.gradient
             .attr('x1', posParams.centerLeftOffset)
@@ -165,7 +179,6 @@ export class BarChartView extends View {
             this.moveBars(bars, posParams);
         }
 
-
         // move masks around
         // if changed:
         //      if 'focused':
@@ -173,7 +186,7 @@ export class BarChartView extends View {
         //          (fade out table masks) [handled by TableView]
         //              DELAY ---> set bar masks
         //                         fade in bar masks
-        //      if 'ontable':
+        //      if 'ontable' or 'faded':
         //          fade out bar masks
         //              END ---> set table masks
         //              DELAY ---> (fade in table masks) [handled by TableView]
@@ -204,7 +217,7 @@ export class BarChartView extends View {
                     .delay(500)
                     .duration(500)
                     .attr('opacity', 1);
-            } else if (this._state === 'ontable') {
+            } else if (this._state === 'ontable' || this._state === 'faded') {
                 nameMasks
                     .transition()
                     .duration(500)
@@ -231,17 +244,23 @@ export class BarChartView extends View {
 
     moveBars(bars, posParams) {
         bars.attr('x', posParams.centerLeftOffset)
-        .attr('y', (d) => this.yScale(d.ID))
-        .attr('height', this.yScale.bandwidth())
-        .attr('width', (d) => {
+          .attr('y', (d) => this.yScale(d.ID))
+          .attr('height', this.yScale.bandwidth())
+          .attr('width', (d) => {
             if (this._state === 'off') {
                 return 0;
             } else if (this._state === 'ontable') {
                 return this.xScale(d.Rating);
             }
             return this.xScale(d.currentRating);
-        })
-        .attr('fill', 'url(#svg-bar-chart-bar-gradient)');
+          })
+          .attr('fill', 'url(#svg-bar-chart-bar-gradient)')
+          .attr('opacity', (d, i) => {
+            if (this._state === 'faded') {
+                return this.model.selectedIndex === i ? 1 : 0.5;
+            }
+            return 1;
+          });
     }
 
     moveBarMasks(nameMasks, ratingMasks, position, transition) {
@@ -276,7 +295,10 @@ export class BarChartView extends View {
 
     chartTopPosition(scrollY) {
         let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
-        return this._state === 'focused' ? fixedTop : fixedTop - scrollY;
+        if (['focused', 'faded', 'done'].includes(this._state)) {
+            return fixedTop;
+        }
+        return fixedTop - scrollY;
     }
 
     captionOpacity(scrollY) {
