@@ -39,10 +39,12 @@ export class View {
             this.caption
               .transition()
               .duration(500)
-              .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
+                .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         } else {
             this.caption
-            .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
+              .transition()
+              .duration(1)
+                .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         }
 
     }

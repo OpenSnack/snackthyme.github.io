@@ -21,12 +21,12 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.7,
-                    top: 0.35
+                    top: 0.4
                 },
                 faded: {
                     width: 0.7,
                     height: 0.7,
-                    top: 0.35
+                    top: 0.4
                 }
             },
             portrait: {
@@ -43,12 +43,12 @@ export class BarChartView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.7,
-                    top: 0.35
+                    top: 0.4
                 },
                 faded: {
                     width: 0.9,
                     height: 0.7,
-                    top: 0.35
+                    top: 0.4
                 }
             }
         };
@@ -123,7 +123,8 @@ export class BarChartView extends View {
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(window.scrollY);
-        this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity, transition: changed}));
+        let capTransition = changed && Object.values(changed).includes('ontable');
+        this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity, transition: capTransition}));
 
         if (changed && Object.values(changed).includes('focused')) {
             this.chart
@@ -295,18 +296,29 @@ export class BarChartView extends View {
 
     chartTopPosition(scrollY) {
         let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
-        if (['focused', 'faded', 'done'].includes(this._state)) {
+        if (this._state === 'focused') {
             return fixedTop;
+        }
+        if (['faded', 'done'].includes(this._state)) {
+            return fixedTop - (scrollY - this.thresholds[3].calcFunction());
         }
         return fixedTop - scrollY;
     }
 
     captionOpacity(scrollY) {
+        // fade in, then out as we go ontable -> focused -> faded
         let onPoint = this.thresholds[2].calcFunction(); // focused
         let scrollOnDiff = scrollY - onPoint;
-        if (scrollOnDiff < 0) return 0;
-        // eventually add caption fade out here
-        return 1;
+        if (scrollOnDiff < 0) {console.log('1'); return 0;}
+
+        let fadeStartPoint = this.thresholds[3].calcFunction();
+        if (scrollY < fadeStartPoint) {console.log('2'); return 1;}
+
+        let offset = this.visibleHeight() * this._captionParams.coords.top;
+        let scrollFadeDiff = fadeStartPoint + offset - scrollY;
+        if (scrollFadeDiff < 0) {console.log('3'); return 0;}
+        console.log('4');
+        return scrollFadeDiff / offset;
     }
 
     buildGradient() {
