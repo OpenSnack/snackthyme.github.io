@@ -65,7 +65,7 @@ export class BarChartView extends View {
             },
             {
                 name: 'faded',
-                calcFunction: (y) => this.visibleHeight() * this.dims[this.orientation()]['off'].top
+                calcFunction: (y) => this.visibleHeight()
             }
         ];
 
@@ -309,15 +309,15 @@ export class BarChartView extends View {
         // fade in, then out as we go ontable -> focused -> faded
         let onPoint = this.thresholds[2].calcFunction(); // focused
         let scrollOnDiff = scrollY - onPoint;
-        if (scrollOnDiff < 0) {console.log('1'); return 0;}
+        if (scrollOnDiff < 0) return 0;
 
         let fadeStartPoint = this.thresholds[3].calcFunction();
-        if (scrollY < fadeStartPoint) {console.log('2'); return 1;}
+        if (scrollY < fadeStartPoint) return 1;
 
         let offset = this.visibleHeight() * this._captionParams.coords.top;
         let scrollFadeDiff = fadeStartPoint + offset - scrollY;
-        if (scrollFadeDiff < 0) {console.log('3'); return 0;}
-        console.log('4');
+        if (scrollFadeDiff < 0) return 0;
+
         return scrollFadeDiff / offset;
     }
 

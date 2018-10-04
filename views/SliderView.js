@@ -28,7 +28,7 @@ export class SliderView extends View {
             },
             {
                 name: 'done',
-                calcFunction: (y) => window.innerHeight * this.dims[this.orientation()].scrollTop
+                calcFunction: (y) => window.innerHeight
             }
         ];
 
