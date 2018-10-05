@@ -46,16 +46,16 @@ export class TableView extends View {
             {name: 'on', calcFunction: null},
             {
                 name: 'fadetext',
-                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()].top - 0.35)
+                calcFunction: () => this.visibleHeight() * (this.dims[this.orientation()].top - 0.35)
             },
             {
                 name: 'off',
-                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()].top - 0.15)
+                calcFunction: () => this.visibleHeight() * (this.dims[this.orientation()].top - 0.15)
             }
         ];
 
         this._state = 'pageload';
-        this.screenHeightRatio = 2;
+        this.screenHeightRatio = 1.3;
         this.textID = 'svg-table-row';
         this.textMaskID = `${this.textID}-mask`;
     }

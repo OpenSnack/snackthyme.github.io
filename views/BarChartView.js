@@ -57,15 +57,15 @@ export class BarChartView extends View {
             {name: 'off', calcFunction: null},
             {
                 name: 'ontable',
-                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.35)
+                calcFunction: () => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.35)
             },
             {
                 name: 'focused',
-                calcFunction: (y) => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.15)
+                calcFunction: () => this.visibleHeight() * (this.dims[this.orientation()]['off'].top - 0.15)
             },
             {
                 name: 'faded',
-                calcFunction: (y) => this.visibleHeight()
+                calcFunction: () => this.visibleHeight()
             }
         ];
 

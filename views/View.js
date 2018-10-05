@@ -24,6 +24,10 @@ export class View {
         return this.container.height() / this.screenHeightRatio;
     }
 
+    visibleOffset() {
+        return this.scrollOffset ? this.visibleHeight() * this.scrollOffset : 0;
+    }
+
     orientation() {
         return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
     }
