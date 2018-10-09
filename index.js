@@ -6,7 +6,7 @@ import {Model} from './Model.js';
 const container = d3.select('#magic-container');
 
 const model = new Model();
-model.loadData('data.csv', 'states.geojson', () => {
+model.loadData('data.csv', 'states.geojson').then(() => {
     window.magic = new MagicView(model, d3.select('#magic-container')).init();
 });
 window.d3 = d3;

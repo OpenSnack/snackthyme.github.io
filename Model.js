@@ -5,19 +5,18 @@ export class Model {
         this._observers = [];
         this.data = [];
         this._sliderValue = 0;
-        this.selectedIndex = 0;
+        this._selectedIndex = 0;
     }
 
-    loadData(csvFile, jsonFile, callback) {
-        csv(csvFile, csv.csvParseRows).then((data) => {
+    loadData(csvFile, jsonFile) {
+        return csv(csvFile, csv.csvParseRows).then((data) => {
             this.data = data;
-            this.loadGeoJson(jsonFile);
-            callback(this);
+            return this.loadGeoJson(jsonFile);
         });
     }
 
     loadGeoJson(filename) {
-        json(filename).then((json) => {
+        return json(filename).then((json) => {
             this.json = json;
             this.setRandomMapData();
         });
@@ -41,6 +40,11 @@ export class Model {
         this.notify({trigger: 'sliderMoved', immediately: true});
     }
 
+    setSelected(index) {
+        this._selectedIndex = index;
+        this._notify({trigger: 'barSelected'});
+    }
+
     currentData() {
         return this.data.map((rowDict) => {
             let rating = this.currentRating(rowDict);
@@ -52,6 +56,10 @@ export class Model {
         let rating = Number(d.Rating);
         let ratio = Number(d.Ratio);
         return rating + this._sliderValue * rating * ratio;
+    }
+
+    selectedDatum() {
+        return Object.assign(this.currentData()[this._selectedIndex], {index: this._selectedIndex});
     }
 
     setRandomMapData() {
@@ -81,9 +89,7 @@ export class Model {
                 }
             );
 
-            rowDict._percents = shuffle(distribution);
+            rowDict.percents = shuffle(distribution);
         });
-
-        return json;
     }
 }

@@ -150,7 +150,7 @@ export class BarChartView extends View {
 
         const posParams = {
             chartWidth: this.container.width() * dims.width,
-            chartHeight: this.container.height() * dims.height,
+            chartHeight: this.visibleHeight() * dims.height,
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -256,12 +256,7 @@ export class BarChartView extends View {
             return this.xScale(d.currentRating);
           })
           .attr('fill', 'url(#svg-bar-chart-bar-gradient)')
-          .attr('opacity', (d, i) => {
-            if (this._state === 'faded') {
-                return this.model.selectedIndex === i ? 1 : 0.5;
-            }
-            return 1;
-          });
+          .attr('opacity', this._state === 'faded' ? 0.5 : 1);
     }
 
     moveBarMasks(nameMasks, ratingMasks, position, transition) {
