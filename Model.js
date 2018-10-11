@@ -30,6 +30,22 @@ export class Model {
         this._observers.forEach((obs) => {obs.update(params || {});});
     }
 
+    getSingleFeature(featureI, polygonI) {
+        let feature = this.json.features[featureI];
+        if (feature.geometry.type === 'Polygon') {
+            return feature;
+        }
+        return {
+            geometry: {
+                coordinates: feature.geometry.coordinates[polygonI],
+                type: 'Polygon'
+            },
+            id: feature.id,
+            properties: feature.properties,
+            type: feature.type
+        };
+    }
+
     getCoordsByIndex(i) {
         const geometry = this.json.features[i].geometry;
         if (geometry.type === 'Polygon') {

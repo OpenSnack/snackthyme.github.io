@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 
 import {View} from './View.js';
+import {path} from 'd3-path';
 
 export class MapView extends View {
     constructor(model, container, parent) {
@@ -105,12 +106,20 @@ export class MapView extends View {
 
             let states = Object.values(stateChanged);
             if (states.includes('focused') && states.includes('splitbar')) {
-                this.drawBar(posParams, true);
+                this.draw(posParams, true);
             } else {
-                this.drawBar(posParams);
+                this.draw(posParams);
             }
         } else {
-            this.drawBar(posParams);
+            this.draw(posParams);
+        }
+    }
+
+    draw(posParams, transition) {
+        if (this._state === 'focused') {
+            this.drawMap(posParams, transition);
+        } else {
+            this.drawBar(posParams, transition);
         }
     }
 
@@ -174,6 +183,35 @@ export class MapView extends View {
             return fixedTop - (this.visibleHeight() - window.scrollY);
         }
         return fixedTop;
+    }
+
+    drawMap(posParams, transition) {
+        const view = this;
+        let pathGroups = this.pathGroups.selectAll('g.pathGroup');
+        const datum = this.model.currentData()[this._selected];
+
+        const projection = d3.geoAlbers();
+        let mapPath = d3.geoPath().projection(projection);
+        const oldBounds = mapPath.bounds(this.model.json);
+        // scale map to fit width defined in this.dims
+        const newScale = projection.scale() * posParams.chartWidth / (oldBounds[1][0] - oldBounds[0][0]);
+        projection.scale(newScale);
+
+        pathGroups
+            .data(datum.percents)
+            .each(function(d, i) {
+                const paths = d3.select(this).selectAll('path'); // eslint-disable-line
+                const value = datum.currentRating * d;
+                const coords = view.model.getCoordsByIndex(i);
+                const features = [];
+                for (let j = 0; j < paths.size(); j++) {
+                    features.push(view.model.getSingleFeature(i, j));
+                }
+
+                paths
+                    .data(features)
+                    .attr('d', mapPath);
+            });
     }
 
     updateSelected() {
