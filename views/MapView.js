@@ -87,7 +87,7 @@ export class MapView extends View {
         const posParams = {
             chartWidth: this.container.width() * dims.width,
             chartHeight: this.visibleHeight() * dims.height,
-            chartTop: this.visibleHeight() * dims.top
+            chartTop: this.barTopPosition(dims)
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -99,7 +99,8 @@ export class MapView extends View {
         if (stateChanged) {
             this.pathGroups
                 .transition()
-                .duration(500)
+                .duration(this._state === 'off' ? 200 : 500)
+                .delay(this._state === 'off' ? 0 : 500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
 
             let states = Object.values(stateChanged);
@@ -165,6 +166,14 @@ export class MapView extends View {
             }
         });
         return pathString + 'Z';
+    }
+
+    barTopPosition(dims) {
+        let fixedTop = this.visibleHeight() * dims.top;
+        if (this._state === 'off') {
+            return fixedTop - (this.visibleHeight() - window.scrollY);
+        }
+        return fixedTop;
     }
 
     updateSelected() {
