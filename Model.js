@@ -50,7 +50,7 @@ export class Model {
 
     setSelected(index) {
         this._selectedIndex = index;
-        this._notify({trigger: 'barSelected'});
+        this.notify({trigger: 'barSelected'});
     }
 
     currentData() {

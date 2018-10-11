@@ -164,7 +164,7 @@ export class MapView extends View {
                 pathString += `${ori} ${step * direction} `;
             }
         });
-        return pathString;
+        return pathString + 'Z';
     }
 
     updateSelected() {
