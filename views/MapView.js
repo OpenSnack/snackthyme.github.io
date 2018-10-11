@@ -51,7 +51,7 @@ export class MapView extends View {
             },
             {
                 name: 'focused',
-                calcFunction: () => this.visibleHeight() * 1.2
+                calcFunction: () => this.visibleHeight() * 1.3
             }
         ];
 
@@ -62,9 +62,15 @@ export class MapView extends View {
     }
 
     init(callback) {
-        this.pathGroup = this.container.append('g');
-        this.model.json.features.forEach((f) => {
-            this.pathGroup.append('path');
+        this.pathGroups = this.container.append('g');
+        this.model.json.features.forEach((feature, i) => {
+            const group = this.pathGroups
+              .append('g')
+                .classed('pathGroup', true);
+
+            this.model.getCoordsByIndex(i).forEach(() => {
+                group.append('path');
+            });
         });
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
@@ -81,6 +87,7 @@ export class MapView extends View {
         const posParams = {
             chartWidth: this.container.width() * dims.width,
             chartHeight: this.visibleHeight() * dims.height,
+            chartTop: this.visibleHeight() * dims.top
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -90,7 +97,7 @@ export class MapView extends View {
             .padding(0.05);
 
         if (stateChanged) {
-            this.pathGroup
+            this.pathGroups
                 .transition()
                 .duration(500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
@@ -107,23 +114,57 @@ export class MapView extends View {
     }
 
     drawBar(position, transition) {
-        let paths = this.pathGroup.selectAll('path');
+        const view = this;
+        let pathGroups = this.pathGroups.selectAll('g.pathGroup');
         const datum = this.model.currentData()[this._selected];
 
-        let previousLeft = 0;
-        paths.data(datum.percents);
+        let nextLeft = position.centerLeftOffset;
 
-        if (transition) {paths = paths.transition().duration(1000);}
+        pathGroups
+            .data(datum.percents)
+            .each(function(d, i) {
+                const paths = d3.select(this).selectAll('path'); // eslint-disable-line
+                const width = view.xScale(datum.currentRating) * d;
+                const top = view.yScale(datum.ID) + position.chartTop;
+                const coords = view.model.getCoordsByIndex(i);
 
-        paths.attr('d', (d, i) => this.makeBarRect(d, i, position));
+                paths.attr('d', (d, i) => view.makeBarRect(nextLeft, top, width, coords, i));
+                nextLeft += width;
+            });
+
+        // if (transition) {paths = paths.transition().duration(1000);}
     }
 
-    makeBarRect(d, i, position) {
-        // console.log(d);
+    makeBarRect(left, top, width, coords, i) {
         // https://bl.ocks.org/mbostock/3081153
         // create different sized rectangles for each part of the bar, which are paths
         // made up of the number of points in each given state's shape, distributed
         // evenly around the rectangle
+        let numPoints = coords[i].length;
+        // this fills an array into quarters of numPoints, then distributes the
+        // remaining 0-3 points into the array as evenly as possible
+        // e.g. 13 points => [4, 3, 3, 3]
+        let sidePoints = Array(4)
+            .fill(Math.floor(numPoints / 4))
+            .map((s, i) => numPoints % 4 >= i+1 ? s + 1 : s);
+
+        let pathString = `M${left} ${top} `;
+
+        sidePoints.forEach((side, j) => {
+            let ori = j % 2 === 0 ? 'h' : 'v';
+            let direction = j < 2 ? 1 : -1;
+            let step = 0;
+            if (ori === 'h') {
+                step = width / (side + 1);
+            } else {
+                step = this.yScale.bandwidth() / (side + 1);
+            }
+
+            for (let k = 0; k <= side; k++) {
+                pathString += `${ori} ${step * direction} `;
+            }
+        });
+        return pathString;
     }
 
     updateSelected() {

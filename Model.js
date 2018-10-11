@@ -30,6 +30,14 @@ export class Model {
         this._observers.forEach((obs) => {obs.update(params || {});});
     }
 
+    getCoordsByIndex(i) {
+        const geometry = this.json.features[i].geometry;
+        if (geometry.type === 'Polygon') {
+            return geometry.coordinates;
+        }
+        return geometry.coordinates.map((c) => c[0]);
+    }
+
     setSliderValue(value) {
         this._sliderValue = value;
         this.notify({trigger: 'sliderMoved', immediately: false});
