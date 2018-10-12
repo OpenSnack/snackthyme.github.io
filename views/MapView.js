@@ -22,7 +22,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.5,
-                    top: 0.4
+                    top: 0.8
                 }
             },
             portrait: {
@@ -39,7 +39,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.4
+                    top: 0.8
                 }
             }
         };
@@ -56,7 +56,7 @@ export class MapView extends View {
             }
         ];
 
-        this.screenHeightRatio = 1;
+        this.screenHeightRatio = 2;
         this.scrollOffset = 1.3;
         this._redThreshold = 5000;
         this._selected = -1;
@@ -88,7 +88,8 @@ export class MapView extends View {
         const posParams = {
             chartWidth: this.container.width() * dims.width,
             chartHeight: this.visibleHeight() * dims.height,
-            chartTop: this.barTopPosition(dims)
+            chartTop: this.barTopPosition(dims),
+            mapTop: this.visibleHeight() * dims.top
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -196,6 +197,10 @@ export class MapView extends View {
         // scale map to fit width defined in this.dims
         const newScale = projection.scale() * posParams.chartWidth / (oldBounds[1][0] - oldBounds[0][0]);
         projection.scale(newScale);
+        projection.translate([
+            this.container.width() / 2,
+            posParams.mapTop + (oldBounds[1][1] - oldBounds[0][1]) / 2
+        ]);
 
         pathGroups
             .data(datum.percents)

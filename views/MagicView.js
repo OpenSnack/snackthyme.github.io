@@ -23,7 +23,7 @@ export class MagicView {
 
         const mapMultiSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
         this.mapView = new MapView(model, mapMultiSVG, this);
-        this.multiChartView = new MultiChartView(model, mapMultiSVG, this);
+        // this.multiChartView = new MultiChartView(model, mapMultiSVG, this);
 
         const sliderDiv = this.viewify(this.container.append('div').attr('id', 'slider'));
         this.sliderView = new SliderView(model, sliderDiv);
@@ -32,7 +32,7 @@ export class MagicView {
             this.tableView,
             this.barChartView,
             this.mapView,
-            this.multiChartView,
+            // this.multiChartView,
             this.sliderView
         ];
     }
