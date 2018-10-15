@@ -223,6 +223,7 @@ export class MapView extends View {
                 paths
                     .data(features)
                     .attr('class', 'map-choro')
+                    .style('opacity', null)
                     .attr('d', mapPath);
             });
     }
