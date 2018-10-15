@@ -256,7 +256,12 @@ export class BarChartView extends View {
             return this.xScale(d.currentRating);
           })
           .attr('fill', 'url(#svg-bar-chart-bar-gradient)')
-          .attr('opacity', this._state === 'faded' ? 0.5 : 1);
+          .attr('opacity', (d, i) => {
+              if (this._state === 'faded') {
+                  return i === this.model.selectedDatum().index ? 0 : 0.5;
+              }
+              return 1;
+          });
     }
 
     moveBarMasks(nameMasks, ratingMasks, position, transition) {

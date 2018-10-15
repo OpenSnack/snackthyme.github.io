@@ -63,6 +63,7 @@ export class MapView extends View {
     }
 
     init(callback) {
+        this.buildDefs();
         this.pathGroups = this.container.append('g');
         this.model.json.features.forEach((feature, i) => {
             const group = this.pathGroups
@@ -129,6 +130,9 @@ export class MapView extends View {
         let pathGroups = this.pathGroups.selectAll('g.pathGroup');
         const datum = this.model.currentData()[this._selected];
 
+        this.pathGroups
+            .attr('transform', 'translate(-1, 0)');
+
         let nextLeft = position.centerLeftOffset;
 
         pathGroups
@@ -139,7 +143,10 @@ export class MapView extends View {
                 const top = view.yScale(datum.ID) + position.chartTop;
                 const coords = view.model.getCoordsByIndex(i);
 
-                paths.attr('d', (d, i) => view.makeBarRect(nextLeft, top, width, coords, i));
+                paths
+                    .attr('class', 'map-bar')
+                    .attr('d', (d, i) => view.makeBarRect(nextLeft, top, width, coords, i))
+                    .style('opacity', (d, i) => i === 0 ? null : 0);
                 nextLeft += width;
             });
 
@@ -215,6 +222,7 @@ export class MapView extends View {
 
                 paths
                     .data(features)
+                    .attr('class', 'map-choro')
                     .attr('d', mapPath);
             });
     }
@@ -227,5 +235,16 @@ export class MapView extends View {
             return {from: oldSelected, to: this._selected};
         }
         return false;
+    }
+
+    buildDefs() {
+        const defs = this.container.append('defs');
+        defs
+          .append('filter')
+            .attr('id', 'map-erode')
+          .append('feMorphology')
+            .attr('operator', 'erode')
+            .attr('in', 'SourceGraphic')
+            .attr('radius', 1);
     }
 }

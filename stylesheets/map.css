@@ -1,0 +1,14 @@
+#magic-svg-3 {
+    position: relative;
+    z-index: 999;
+}
+
+g.pathGroup path {
+    opacity: 0.6;
+    fill: rgb(100,200,255);
+    filter: url(#map-erode);
+}
+
+path.map-bar {
+    shape-rendering: crispEdges;
+}
