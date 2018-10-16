@@ -27,6 +27,11 @@ export class BarChartView extends View {
                     width: 0.7,
                     height: 0.7,
                     top: 0.4
+                },
+                done: {
+                    width: 0.7,
+                    height: 0.7,
+                    top: 0.4
                 }
             },
             portrait: {
@@ -49,6 +54,11 @@ export class BarChartView extends View {
                     width: 0.9,
                     height: 0.7,
                     top: 0.4
+                },
+                done: {
+                    width: 0.9,
+                    height: 0.7,
+                    top: 0.4
                 }
             }
         };
@@ -66,6 +76,10 @@ export class BarChartView extends View {
             {
                 name: 'faded',
                 calcFunction: () => this.visibleHeight()
+            },
+            {
+                name: 'done',
+                calcFunction: () => this.visibleHeight() * 1.3
             }
         ];
 
@@ -260,7 +274,7 @@ export class BarChartView extends View {
               if (this._state === 'faded') {
                   return i === this.model.selectedDatum().index ? 0 : 0.5;
               }
-              return 1;
+              return this._state === 'done' ? 0 : 1;
           });
     }
 
