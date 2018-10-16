@@ -123,7 +123,12 @@ export class BarChartView extends View {
           .enter()
           .append('rect')
             .attr('class', 'svg-bar-chart-bar')
-            .attr('mask', (d, i) => `url(#${this.tableMaskID}-${i})`);
+            .attr('mask', (d, i) => `url(#${this.tableMaskID}-${i})`)
+            .on('click', (d, i) => {
+                if (this._state === 'faded') {
+                    this.model.setSelected(i);
+                }
+            });
 
         this.buildGradient();
         this.buildTextMasks();
@@ -255,6 +260,12 @@ export class BarChartView extends View {
         }
 
         // HANDLE RESIZE FOR TABLE MASKS
+
+        if (this._state === 'faded') {
+            this.container.style('z-index', 998);
+        } else {
+            this.container.style('z-index', null);
+        }
     }
 
     moveBars(bars, posParams) {
