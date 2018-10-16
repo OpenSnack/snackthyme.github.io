@@ -22,7 +22,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.5,
-                    top: 0.8
+                    top: 0.6
                 }
             },
             portrait: {
@@ -39,7 +39,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.8
+                    top: 0.6
                 }
             }
         };
@@ -56,6 +56,7 @@ export class MapView extends View {
             }
         ];
 
+        this._state = 'pageload';
         this.screenHeightRatio = 2;
         this.scrollOffset = 1.3;
         this._redThreshold = 5000;
@@ -108,11 +109,9 @@ export class MapView extends View {
 
             let states = Object.values(stateChanged);
             if (states.includes('focused') && states.includes('splitbar')) {
-                this.draw(posParams, true);
-            } else {
-                this.draw(posParams);
+                this.draw(posParams, stateChanged);
             }
-        } else {
+        } else if (trigger === 'resize') {
             this.draw(posParams);
         }
     }
@@ -138,19 +137,26 @@ export class MapView extends View {
         pathGroups
             .data(datum.percents)
             .each(function(d, i) {
-                const paths = d3.select(this).selectAll('path'); // eslint-disable-line
+                let paths = d3.select(this).selectAll('path'); // eslint-disable-line
                 const width = view.xScale(datum.currentRating) * d;
                 const top = view.yScale(datum.ID) + position.chartTop;
                 const coords = view.model.getCoordsByIndex(i);
 
                 paths
-                    .attr('class', 'map-bar')
+                    .attr('class', 'map-bar');
+
+                if (transition) {
+                    paths = paths
+                        .transition()
+                        .delay(i * 20)
+                        .duration(1000);
+                }
+                paths
                     .attr('d', (d, i) => view.makeBarRect(nextLeft, top, width, coords, i))
-                    .style('opacity', (d, i) => i === 0 ? null : 0);
+                    .style('opacity', (d, i) => i === 0 ? 0.6 : 0);
+
                 nextLeft += width;
             });
-
-        // if (transition) {paths = paths.transition().duration(1000);}
     }
 
     makeBarRect(left, top, width, coords, i) {
@@ -165,23 +171,28 @@ export class MapView extends View {
         let sidePoints = Array(4)
             .fill(Math.floor(numPoints / 4))
             .map((s, i) => numPoints % 4 >= i+1 ? s + 1 : s);
+        sidePoints[0] -= 1; // account for starting moveTo (M) command
+        sidePoints[3] -= 1; // account for ending closePath (Z) command
 
-        let pathString = `M${left} ${top} `;
+        let pathString = `M${left},${top}`;
 
         sidePoints.forEach((side, j) => {
-            let ori = j % 2 === 0 ? 'h' : 'v';
             let direction = j < 2 ? 1 : -1;
-            let step = 0;
-            if (ori === 'h') {
-                step = width / (side + 1);
-            } else {
-                step = this.yScale.bandwidth() / (side + 1);
-            }
+            let horizStep = width / side;
+            let vertStep = this.yScale.bandwidth() / side;
 
-            for (let k = 0; k <= side; k++) {
-                pathString += `${ori} ${step * direction} `;
+            for (let k = 0; k < side; k++) {
+                if (j % 2 === 0) {
+                    // horizontal side
+                    left += direction * horizStep;
+                } else {
+                    // vertical side
+                    top += direction * vertStep;
+                }
+                pathString += `L${left},${top}`;
             }
         });
+
         return pathString + 'Z';
     }
 
@@ -222,9 +233,16 @@ export class MapView extends View {
 
                 paths
                     .data(features)
-                    .attr('class', 'map-choro')
-                    .style('opacity', null)
-                    .attr('d', mapPath);
+                    .attr('class', 'map-choro');
+
+                if (transition) {
+                    paths
+                        .transition()
+                        .delay(i * 20)
+                        .duration(1000)
+                        .attr('d', mapPath)
+                        .style('opacity', 0.6);
+                }
             });
     }
 
