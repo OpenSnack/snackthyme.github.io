@@ -114,6 +114,12 @@ export class MapView extends View {
         } else if (trigger === 'resize') {
             this.draw(posParams);
         }
+
+        if (this._state === 'off') {
+            this.container.style('z-index', null);
+        } else {
+            this.container.style('z-index', 999);
+        }
     }
 
     draw(posParams, transition) {
