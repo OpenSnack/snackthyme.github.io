@@ -177,8 +177,15 @@ export class MapView extends View {
         let sidePoints = Array(4)
             .fill(Math.floor(numPoints / 4))
             .map((s, i) => numPoints % 4 >= i+1 ? s + 1 : s);
-        sidePoints[0] -= 1; // account for starting moveTo (M) command
-        sidePoints[3] -= 1; // account for ending closePath (Z) command
+
+        if (numPoints < 6) {
+            // D3 can easily handle its map path having more points than the bar rect,
+            // but the other way not so much. In any case this is fine
+            sidePoints = [1, 1, 1, 0];
+        } else {
+            sidePoints[0] -= 1; // account for starting moveTo (M) command
+            sidePoints[3] -= 1; // account for ending closePath (Z) command
+        }
 
         let pathString = `M${left},${top}`;
 
