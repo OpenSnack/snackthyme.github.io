@@ -107,10 +107,10 @@ export class MapView extends View {
                 .delay(this._state === 'off' ? 0 : 500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
 
-            let states = Object.values(stateChanged);
-            if (states.includes('focused') && states.includes('splitbar')) {
+            // let states = Object.values(stateChanged);
+            // if (states.includes('focused') && states.includes('splitbar')) {
                 this.draw(posParams, stateChanged);
-            }
+            // }
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
@@ -148,7 +148,7 @@ export class MapView extends View {
                 if (transition) {
                     paths = paths
                         .transition()
-                        .delay(i * 20)
+                        .delay(Object.values(transition).includes('focused') ? i * 20 : 0)
                         .duration(1000);
                 }
                 paths
