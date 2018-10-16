@@ -111,7 +111,7 @@ export class MapView extends View {
             if (states.includes('focused') && states.includes('splitbar')) {
                 this.draw(posParams, stateChanged);
             }
-        } else if (trigger === 'resize') {
+        } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
 
