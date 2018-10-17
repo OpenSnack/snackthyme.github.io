@@ -196,7 +196,7 @@ export class TableView extends View {
                 return window.scrollY >= tableView.fadeTextThreshold() ? 0 : 1;
             })
             .each(function(d, i) {
-                tableView.buildTextMask(d, i, tableView.defs, rowIndex, className, position);
+                tableView.moveTextMask(d, i, tableView.defs, rowIndex, className, position);
             });
 
         return group.selectAll('.cell-group');
@@ -238,7 +238,7 @@ export class TableView extends View {
         });
     }
 
-    buildTextMask(d, i, defs, rowIndex, className, position) {
+    moveTextMask(d, i, defs, rowIndex, className, position) {
         if (rowIndex < 0 || i > 1) return; // skip header and anything past first two columns
 
         const {numCols, numRows, tableWidth, tableHeight, centerLeftOffset} = position;
@@ -258,15 +258,17 @@ export class TableView extends View {
                 .attr('height', '100%')
                 .attr('fill', 'white');
         }
+
         let mask = defs.select(`#${className}-mask-${rowIndex}`);
-        if (mask.selectAll('text').filter((datum) => datum === d).empty()) {
-            mask
-              .append('text')
+        let text = mask.selectAll('text').filter((datum) => datum === d);
+        if (text.empty()) {
+            mask.append('text')
                 .datum(d)
-                .classed(`${className}-mask-text`, true)
-                .attr('x', centerLeftOffset + tableWidth / numCols * (i + 0.1))
-                .attr('y', tableHeight / numRows * (rowIndex + 0.5))
-                .text(d);
+                .classed(`${className}-mask-text`, true);
         }
+
+        text.attr('x', centerLeftOffset + tableWidth / numCols * (i + 0.1))
+            .attr('y', tableHeight / numRows * (rowIndex + 0.5))
+            .text(d);
     }
 }
