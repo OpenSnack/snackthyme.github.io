@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 
 import {View} from './View.js';
+import {scrollMatchingTween} from '../scrollMatchingTween.js';
 
 export class BarChartView extends View {
     constructor(model, container, parent, params) {
@@ -149,18 +150,7 @@ export class BarChartView extends View {
             this.chart
                 .transition()
                 .duration(500)
-                // A D V A N C E D  T A C T I C S
-                // This tween checks the scroll position on each time tick to ensure that the chart ends
-                // up in the right place regardless of where we started from or where we scrolled to.
-                .attrTween('transform', () => {
-                    let source = Number(this.chart.attr('transform').split(',')[1].slice(1, -1));
-
-                    return (t) => {
-                        let dest = this.chartTopPosition(window.scrollY);
-                        let inter = d3.interpolate(source, dest);
-                        return `translate(0, ${inter(t)})`;
-                    };
-                });
+                .call(scrollMatchingTween, this.chartTopPosition.bind(this));
         } else {
             this.chart.attr('transform', `translate(0, ${this.chartTopPosition(window.scrollY)})`);
         }
@@ -319,15 +309,15 @@ export class BarChartView extends View {
             .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
     }
 
-    chartTopPosition(scrollY) {
+    chartTopPosition() {
         let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
         if (this._state === 'focused') {
             return fixedTop;
         }
         if (['faded', 'done'].includes(this._state)) {
-            return fixedTop - (scrollY - this.thresholds[3].calcFunction());
+            return fixedTop - (window.scrollY - this.thresholds[3].calcFunction());
         }
-        return fixedTop - scrollY;
+        return fixedTop - window.scrollY;
     }
 
     captionOpacity(scrollY) {

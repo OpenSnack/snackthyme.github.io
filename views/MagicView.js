@@ -67,6 +67,14 @@ export class MagicView {
             return this.node().clientHeight;
         };
 
+        selection.viewportTop = function() {
+            return this.node().getBoundingClientRect().top;
+        };
+
+        selection.top = function() {
+            return window.scrollY + this.node().getBoundingClientRect().top;
+        };
+
         return selection;
     }
 }

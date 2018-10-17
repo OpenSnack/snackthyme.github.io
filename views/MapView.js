@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
+import {path} from 'd3-path';
 
 import {View} from './View.js';
-import {path} from 'd3-path';
+import {scrollMatchingTween} from '../scrollMatchingTween.js';
 
 export class MapView extends View {
     constructor(model, container, parent) {
@@ -22,7 +23,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.5,
-                    top: 0.6
+                    top: 0.4
                 }
             },
             portrait: {
@@ -39,7 +40,7 @@ export class MapView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.6
+                    top: 0.4
                 }
             }
         };
@@ -65,7 +66,10 @@ export class MapView extends View {
 
     init(callback) {
         this.buildDefs();
-        this.pathGroups = this.container.append('g');
+        this.pathGroups = this.container
+          .append('g')
+            .attr('transform', 'translate(-1, 0)');
+
         this.model.json.features.forEach((feature, i) => {
             const group = this.pathGroups
               .append('g')
@@ -89,9 +93,7 @@ export class MapView extends View {
 
         const posParams = {
             chartWidth: this.container.width() * dims.width,
-            chartHeight: this.visibleHeight() * dims.height,
-            chartTop: this.barTopPosition(dims),
-            mapTop: this.visibleHeight() * dims.top
+            chartHeight: this.visibleHeight() * dims.height
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -100,19 +102,29 @@ export class MapView extends View {
         this.yScale.range([0, posParams.chartHeight])
             .padding(0.05);
 
+        this.translateMap(posParams, stateChanged);
+
         if (stateChanged) {
             this.pathGroups
-                .transition()
+                .transition('map-opacity')
                 .duration(this._state === 'off' ? 200 : 500)
                 .delay(this._state === 'off' ? 0 : 500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
 
-            // let states = Object.values(stateChanged);
-            // if (states.includes('focused') && states.includes('splitbar')) {
-                this.draw(posParams, stateChanged);
-            // }
+            this.draw(posParams, stateChanged);
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
+        }
+    }
+
+    translateMap(posParams, transition) {
+        if (transition) {
+            this.pathGroups
+                .transition('map-translate')
+                .duration(1000)
+                .call(scrollMatchingTween, this.topPosition.bind(this));
+        } else {
+            this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
         }
     }
 
@@ -124,13 +136,24 @@ export class MapView extends View {
         }
     }
 
+    mapTopPosition() {
+        const dims = this.dims[this.orientation()][this._state];
+        return this.visibleHeight() * dims.top + window.scrollY - this.container.top();
+    }
+
+    topPosition() {
+        const dims = this.dims[this.orientation()][this._state];
+        if (['off', 'splitbar'].includes(this._state)) {
+            return this.barTopPosition(dims);
+        }
+        return this.mapTopPosition();
+    }
+
     drawBar(position, transition) {
         const view = this;
+        const dims = this.dims[this.orientation()][this._state];
         let pathGroups = this.pathGroups.selectAll('g.pathGroup');
         const datum = this.model.currentData()[this._selected];
-
-        this.pathGroups
-            .attr('transform', 'translate(-1, 0)');
 
         let nextLeft = position.centerLeftOffset;
 
@@ -139,7 +162,7 @@ export class MapView extends View {
             .each(function(d, i) {
                 let paths = d3.select(this).selectAll('path'); // eslint-disable-line
                 const width = view.xScale(datum.currentRating) * d;
-                const top = view.yScale(datum.ID) + position.chartTop;
+                const top = view.yScale(datum.ID);
                 const coords = view.model.getCoordsByIndex(i);
 
                 paths
@@ -224,13 +247,13 @@ export class MapView extends View {
         projection.scale(newScale);
         projection.translate([
             this.container.width() / 2,
-            posParams.mapTop + (oldBounds[1][1] - oldBounds[0][1]) / 2
+            (oldBounds[1][1] - oldBounds[0][1]) / 2
         ]);
 
         pathGroups
             .data(datum.percents)
             .each(function(d, i) {
-                const paths = d3.select(this).selectAll('path'); // eslint-disable-line
+                let paths = d3.select(this).selectAll('path'); // eslint-disable-line
                 const value = datum.currentRating * d;
                 const coords = view.model.getCoordsByIndex(i);
                 const features = [];
@@ -243,10 +266,10 @@ export class MapView extends View {
                     .attr('class', 'map-choro');
 
                 if (transition) {
-                    paths
-                        .transition()
-                        .delay(i * 20)
-                        .duration(1000)
+                    paths = paths
+                      .transition()
+                      .delay(i * 20)
+                      .duration(1000)
                         .attr('d', mapPath)
                         .style('opacity', 0.6);
                 }
