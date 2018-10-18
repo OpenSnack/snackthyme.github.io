@@ -269,10 +269,12 @@ export class MapView extends View {
                     paths = paths
                       .transition()
                       .delay(i * 20)
-                      .duration(1000)
-                        .attr('d', mapPath)
-                        .style('opacity', 0.6);
+                      .duration(1000);
                 }
+
+                paths
+                    .attr('d', mapPath)
+                    .style('opacity', 0.6);
             });
     }
 
