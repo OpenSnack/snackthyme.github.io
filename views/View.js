@@ -32,22 +32,24 @@ export class View {
         return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
     }
 
-    setCaption(params) {
-        this.caption
+    setCaption(params, target) {
+        target = target || this.caption;
+
+        target
             .style('width', params.coords.width * window.innerWidth + 'px')
             .style('top', params.coords.top * window.innerHeight + 'px')
             .style('left', params.coords.left * window.innerWidth + 'px')
-            .text(params.text);
+            .html(params.text);
 
         if (params.transition) {
-            this.caption
+            target
               .transition()
               .duration(500)
                 .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         } else {
-            this.caption
-              .transition()
-              .duration(1)
+            target
+            //   .transition()
+            //   .duration(1)
                 .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         }
 

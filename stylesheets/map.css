@@ -7,6 +7,19 @@ g.pathGroup path {
     filter: url(#map-erode);
 }
 
+@media screen and (min-width: 1921px) {
+    g.pathGroup path {
+        filter: url(#map-erode-more);
+    }
+}
+
+@media screen and (min-width: 2561px) {
+    g.pathGroup path {
+        filter: url(#map-erode-most);
+    }
+}
+
+
 path.map-bar {
     shape-rendering: crispEdges;
 }

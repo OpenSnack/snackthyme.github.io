@@ -24,6 +24,16 @@ export class MapView extends View {
                     width: 0.7,
                     height: 0.5,
                     top: 0.4
+                },
+                hover: {
+                    width: 0.7,
+                    height: 0.5,
+                    top: 0.4
+                },
+                done: {
+                    width: 0.7,
+                    height: 0.5,
+                    top: 2
                 }
             },
             portrait: {
@@ -41,6 +51,16 @@ export class MapView extends View {
                     width: 0.9,
                     height: 0.5,
                     top: 0.4
+                },
+                hover: {
+                    width: 0.9,
+                    height: 0.5,
+                    top: 0.4
+                },
+                done: {
+                    width: 0.9,
+                    height: 0.5,
+                    top: 2
                 }
             }
         };
@@ -54,6 +74,41 @@ export class MapView extends View {
             {
                 name: 'focused',
                 calcFunction: () => this.visibleHeight() * 1.3
+            },
+            {
+                name: 'hover',
+                calcFunction: () => this.visibleHeight() * 1.7
+            },
+            {
+                name: 'done',
+                calcFunction: () => this.visibleHeight() * 2
+            },
+        ];
+
+        this._captionParams = [
+            {
+                text: 'What if you could',
+                coords: {
+                    width: 0.9,
+                    top: 0.2,
+                    left: 0.05
+                }
+            },
+            {
+                text: 'see the big picture?',
+                coords: {
+                    width: 0.9,
+                    top: 0.27,
+                    left: 0.05
+                }
+            },
+            {
+                text: 'clarify the details?',
+                coords: {
+                    width: 0.9,
+                    top: 0.27,
+                    left: 0.05
+                }
             }
         ];
 
@@ -82,6 +137,16 @@ export class MapView extends View {
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
+
+        this.captionTop = this.parent.container
+          .append('span')
+            .classed('caption', true);
+        this.caption1 = this.parent.container
+          .append('span')
+            .classed('caption', true);
+        this.caption2 = this.parent.container
+          .append('span')
+            .classed('caption', true);
     }
 
     update(params) {
@@ -99,10 +164,12 @@ export class MapView extends View {
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
 
         this.xScale.rangeRound([0, posParams.chartWidth]);
-        this.yScale.range([0, posParams.chartHeight])
-            .padding(0.05);
+        this.yScale.range([0, posParams.chartHeight]).padding(0.05);
 
         this.translateMap(posParams, stateChanged);
+        this.setCaptions(stateChanged);
+
+        let states = stateChanged ? Object.values(stateChanged) : [];
 
         if (stateChanged) {
             this.pathGroups
@@ -111,25 +178,42 @@ export class MapView extends View {
                 .delay(this._state === 'off' ? 0 : 500)
                 .attr('opacity', this._state === 'off' ? 0 : 1);
 
-            this.draw(posParams, stateChanged);
+            if (!(states.includes('hover') || states.includes('done'))) {
+                this.draw(posParams, stateChanged);
+            } else {
+                this.draw(posParams);
+            }
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
     }
 
-    translateMap(posParams, transition) {
-        if (transition) {
+    isMapState() {
+        return ['focused', 'hover', 'done'].includes(this._state);
+    }
+
+    isFixedState(stateChanged) {
+        if (!stateChanged) {
+            return ['focused', 'hover', 'done'].includes(this._state);
+        }
+        let states = Object.values(stateChanged);
+        return !(states.includes('hover') || states.includes('done'));
+    }
+
+    translateMap(posParams, stateChanged) {
+        let states = Object.values(stateChanged || {});
+        if (states.length === 0 || states.includes('hover') || states.includes('done')) {
+            this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
+        } else {
             this.pathGroups
                 .transition('map-translate')
                 .duration(1000)
                 .call(scrollMatchingTween, this.topPosition.bind(this));
-        } else {
-            this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
         }
     }
 
     draw(posParams, transition) {
-        if (this._state === 'focused') {
+        if (this.isMapState()) {
             this.drawMap(posParams, transition);
         } else {
             this.drawBar(posParams, transition);
@@ -290,12 +374,46 @@ export class MapView extends View {
 
     buildDefs() {
         const defs = this.container.append('defs');
-        defs
-          .append('filter')
-            .attr('id', 'map-erode')
-          .append('feMorphology')
-            .attr('operator', 'erode')
-            .attr('in', 'SourceGraphic')
-            .attr('radius', 1);
+        const sizes = [['map-erode', 1], ['map-erode-more', 2], ['map-erode-most', 4]];
+
+        sizes.forEach(([id, radius]) => {
+            defs
+              .append('filter')
+                .attr('id', id)
+              .append('feMorphology')
+                .attr('operator', 'erode')
+                .attr('in', 'SourceGraphic')
+                .attr('radius', radius);
+        });
+    }
+
+    setCaptions(changed) {
+        // do this kinda thing like two or three times
+        let capOpacities = this.captionOpacities(window.scrollY);
+        let capTransition = changed;
+        [this.captionTop, this.caption1, this.caption2].forEach((caption, i) => {
+            this.setCaption(
+                Object.assign({}, this._captionParams[i], {opacity: capOpacities[i], transition: capTransition}),
+                caption
+            );
+        });
+    }
+
+    captionOpacities(scrollY) {
+        if (['off', 'splitbar'].includes(this._state)) {
+            return [0, 0, 0];
+        } else if (this._state === 'focused') {
+            return [1, 1, 0];
+        } else if (this._state === 'hover') {
+            return [1, 0, 1];
+        }
+
+        let fadeStartPoint = this.thresholds[4].calcFunction(); // done
+        let offset = this.visibleHeight() * this._captionParams[0].coords.top;
+        let scrollFadeDiff = fadeStartPoint + offset - scrollY;
+        if (scrollFadeDiff < 0) return [0, 0, 0];
+
+        let fadingOpacity = scrollFadeDiff / offset;
+        return [fadingOpacity, 0, fadingOpacity];
     }
 }
