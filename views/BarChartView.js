@@ -148,10 +148,10 @@ export class BarChartView extends View {
 
         if (changed && Object.values(changed).includes('focused')) {
             this.chart
-                .transition()
+                .transition('bar-chart-translate')
                 .duration(500)
                 .call(scrollMatchingTween, this.chartTopPosition.bind(this));
-        } else {
+        } else if (!d3.active(this.chart.node(), 'bar-chart-translate')) {
             this.chart.attr('transform', `translate(0, ${this.chartTopPosition(window.scrollY)})`);
         }
 
