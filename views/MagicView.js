@@ -39,9 +39,9 @@ export class MagicView {
 
     init() {
         this.model.addObserver(this);
-        this.container.style('height', window.innerHeight * this._svgSizeMult + 'px');
+        this.container.style('height', document.body.clientHeight * this._svgSizeMult + 'px');
         this.views.forEach((view) => {
-            view.setHeight(window.innerHeight);
+            view.setHeight(document.body.clientHeight);
             view.init();
         });
 
@@ -52,7 +52,7 @@ export class MagicView {
 
     update(params) {
         this.views.forEach((view) => {
-            view.setHeight(window.innerHeight);
+            view.setHeight(document.body.clientHeight);
             view.update(params);
         });
     }

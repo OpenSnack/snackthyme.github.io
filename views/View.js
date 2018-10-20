@@ -29,16 +29,16 @@ export class View {
     }
 
     orientation() {
-        return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
+        return document.body.clientWidth >= document.body.clientHeight ? 'landscape' : 'portrait';
     }
 
     setCaption(params, target) {
         target = target || this.caption;
 
         target
-            .style('width', params.coords.width * window.innerWidth + 'px')
-            .style('top', params.coords.top * window.innerHeight + 'px')
-            .style('left', params.coords.left * window.innerWidth + 'px')
+            .style('width', params.coords.width * document.body.clientWidth + 'px')
+            .style('top', params.coords.top * document.body.clientHeight + 'px')
+            .style('left', params.coords.left * document.body.clientWidth + 'px')
             .html(params.text);
 
         if (params.transition) {

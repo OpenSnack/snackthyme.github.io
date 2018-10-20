@@ -112,7 +112,7 @@ export class MapView extends View {
             }
         ];
 
-        this._state = 'pageload';
+        this._state = 'off';
         this.screenHeightRatio = 2;
         this.scrollOffset = 1.3;
         this._redThreshold = 5000;

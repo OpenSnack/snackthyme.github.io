@@ -24,11 +24,11 @@ export class SliderView extends View {
             {name: 'off', calcFunction: null},
             {
                 name: 'focused',
-                calcFunction: (y) => window.innerHeight * (this.dims[this.orientation()].scrollTop - 0.15)
+                calcFunction: (y) => document.body.clientHeight * (this.dims[this.orientation()].scrollTop - 0.15)
             },
             {
                 name: 'done',
-                calcFunction: (y) => window.innerHeight
+                calcFunction: (y) => document.body.clientHeight
             }
         ];
 
@@ -65,9 +65,9 @@ export class SliderView extends View {
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
         const dims = this.dims[this.orientation()];
 
-        const sliderWidth = window.innerWidth * dims.width;
-        const sliderTop = window.innerHeight * dims.top;
-        const centerLeftOffset = (window.innerWidth - sliderWidth) / 2;
+        const sliderWidth = document.body.clientWidth * dims.width;
+        const sliderTop = document.body.clientHeight * dims.top;
+        const centerLeftOffset = (document.body.clientWidth - sliderWidth) / 2;
 
         this.container
             .style('left', centerLeftOffset)
