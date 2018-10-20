@@ -93,7 +93,7 @@ export class BarChartView extends View {
             }
         };
 
-        this.screenHeightRatio = 1;
+        this.screenHeightRatio = 2;
 
         if (params && params.maskID) {
             this.tableMaskID = params.maskID;
@@ -108,6 +108,8 @@ export class BarChartView extends View {
 
     init(callback) {
         const dims = this.dims[this.orientation()][this._state];
+
+        this.container.style('position', 'absolute');
         this.chart = this.container
           .append('g')
             .attr('transform', `translate(0, ${dims.top * this.container.height()})`);
@@ -146,16 +148,16 @@ export class BarChartView extends View {
         let capTransition = changed && Object.values(changed).includes('ontable');
         this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity, transition: capTransition}));
 
+        const dims = this.dims[this.orientation()][this._state];
+
         if (changed && Object.values(changed).includes('focused')) {
             this.chart
                 .transition('bar-chart-translate')
                 .duration(500)
-                .call(scrollMatchingTween, this.chartTopPosition.bind(this));
+                .call(scrollMatchingTween, () => this.chartTopPosition(true));
         } else if (!d3.active(this.chart.node(), 'bar-chart-translate')) {
-            this.chart.attr('transform', `translate(0, ${this.chartTopPosition(window.scrollY)})`);
+            this.chart.attr('transform', `translate(0, ${this.chartTopPosition(changed)})`);
         }
-
-        const dims = this.dims[this.orientation()][this._state];
 
         const posParams = {
             chartWidth: this.container.width() * dims.width,
@@ -178,10 +180,20 @@ export class BarChartView extends View {
 
         // on resize, just move right away
         if (trigger !== 'resize') {
-            if (changed || trigger === 'sliderMoved') {
+            if (trigger === 'sliderMoved') {
                 bars = bars.transition().duration(500);
-                if (trigger === 'sliderMoved') {
-                    bars = bars.ease(d3.easeCubicOut);
+                bars = bars.ease(d3.easeCubicOut);
+            } else if (changed) {
+                bars = bars.transition().duration(500);
+                if (this._state === 'focused') {
+                    bars.on('end', () => {
+                        this.container.style('position', 'fixed');
+                        this.chart.attr('transform', `translate(0, ${this.visibleHeight() * dims.top})`);
+                    });
+                } else if (this._state === 'ontable') {
+                    const oldDims = this.dims[this.orientation()]['focused'];
+                    this.container.style('position', 'absolute');
+                    this.chart.attr('transform', `translate(0, ${this.visibleHeight() * oldDims.top + window.scrollY})`);
                 }
             }
             this.moveBars(bars, posParams);
@@ -249,8 +261,6 @@ export class BarChartView extends View {
             this.moveBarMasks(nameMasks, ratingMasks, posParams, {ease: d3.easeCubicOut});
         }
 
-        // HANDLE RESIZE FOR TABLE MASKS
-
         if (this._state === 'faded') {
             this.container.style('z-index', 998);
         } else {
@@ -309,15 +319,19 @@ export class BarChartView extends View {
             .attr('y', (d) => this.yScale(d.ID) + this.yScale.bandwidth() / 2);
     }
 
-    chartTopPosition() {
-        let fixedTop = this.dims[this.orientation()][this._state].top * this.visibleHeight();
-        if (this._state === 'focused') {
-            return fixedTop;
-        }
+    chartTopPosition(changed) {
+        let dimsTop = this.dims[this.orientation()][this._state].top;
+        let fixedTop = dimsTop * this.visibleHeight();
         if (['faded', 'done'].includes(this._state)) {
             return fixedTop - (window.scrollY - this.thresholds[3].calcFunction());
         }
-        return fixedTop - window.scrollY;
+        if (changed && this._state === 'focused') {
+            return fixedTop + window.scrollY;
+        }
+        // if (changed && changed.from === 'focused' && changed.to === 'ontable') {
+        //     return fixedTop + window.scrollY;
+        // }
+        return fixedTop;
     }
 
     captionOpacity(scrollY) {

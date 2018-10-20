@@ -203,7 +203,9 @@ export class MapView extends View {
     translateMap(posParams, stateChanged) {
         let states = Object.values(stateChanged || {});
         if (states.length === 0 || states.includes('hover') || states.includes('done')) {
-            this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
+            if (!d3.active(this.pathGroups.node(), 'map-translate')) {
+                this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
+            }
         } else {
             this.pathGroups
                 .transition('map-translate')
