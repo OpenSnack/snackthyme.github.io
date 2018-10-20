@@ -60,7 +60,7 @@ export class View {
         let thresholds = this.thresholds
             .slice(1)
             .map((spec) => ({name: spec.name, y: spec.calcFunction()}))
-            .sort((a, b) => a[1] > b[1]);
+            .sort((a, b) => a.y > b.y);
 
         if (scrollY < thresholds[0].y) {
             this._state = this.thresholds[0].name;
