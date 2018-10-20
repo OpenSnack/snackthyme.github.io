@@ -24,12 +24,16 @@ export class TableView extends View {
             {
                 id: 'svg-table-header-gradient',
                 stop1: 'rgb(245, 113, 67)',
-                stop2: 'rgb(245, 113, 67)'
+                stop1Opacity: 1,
+                stop2: 'rgb(245, 113, 67)',
+                stop2Opacity: 1
             },
             {
                 id: 'svg-table-content-gradient',
-                stop1: 'rgba(255,255,255,0.2)',
-                stop2: 'rgba(255,255,255,0.2)'
+                stop1: 'rgb(255,255,255)',
+                stop1Opacity: 0.2,
+                stop2: 'rgba(255,255,255)',
+                stop2Opacity: 0.2
             }
         ];
 
@@ -230,11 +234,13 @@ export class TableView extends View {
             gradient
               .append('stop')
                 .attr('offset', '0%')
-                .attr('stop-color', spec.stop1);
+                .attr('stop-color', spec.stop1)
+                .attr('stop-opacity', spec.stop1Opacity);
             gradient
               .append('stop')
                 .attr('offset', '100%')
-                .attr('stop-color', spec.stop2);
+                .attr('stop-color', spec.stop2)
+                .attr('stop-opacity', spec.stop2Opacity);
         });
     }
 
