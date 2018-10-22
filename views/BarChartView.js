@@ -376,23 +376,28 @@ export class BarChartView extends View {
 
         this.gradient.append('stop')
             .attr('offset', '0%')
-            .attr('stop-color', 'rgba(255,255,255, 0.5)');
+            .attr('stop-color', 'rgb(255,255,255)')
+            .attr('stop-opacity', 0.5);
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'rgba(255,255,255, 0.8)');
+            .attr('stop-color', 'rgb(255,255,255)')
+            .attr('stop-opacity', 0.8);
 
         this.gradient.append('stop')
             .attr('offset', '67%')
-            .attr('stop-color', 'rgba(100,200,255, 0.8)');
+            .attr('stop-color', 'rgb(100,200,255)')
+            .attr('stop-opacity', 0.8);
 
         this.gradient.append('stop')
             .attr('offset', '95%')
-            .attr('stop-color', 'rgba(100,200,255, 1)');
+            .attr('stop-color', 'rgb(100,200,255)')
+            .attr('stop-opacity', 1);
 
         this.gradient.append('stop')
             .attr('offset', '100%')
-            .attr('stop-color', 'rgba(100,200,255, 0)');
+            .attr('stop-color', 'rgb(100,200,255)')
+            .attr('stop-opacity', 0);
     }
 
     buildTextMasks() {
