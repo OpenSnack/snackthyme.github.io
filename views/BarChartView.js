@@ -154,9 +154,9 @@ export class BarChartView extends View {
             this.chart
                 .transition('bar-chart-translate')
                 .duration(500)
-                .call(scrollMatchingTween, () => this.chartTopPosition(true));
+                .call(scrollMatchingTween, () => this.chartTopPosition(changed));
         } else if (!d3.active(this.chart.node(), 'bar-chart-translate')) {
-            this.chart.attr('transform', `translate(0, ${this.chartTopPosition(changed)})`);
+            this.chart.attr('transform', `translate(-1, ${this.chartTopPosition(changed)})`);
         }
 
         const posParams = {
@@ -192,7 +192,7 @@ export class BarChartView extends View {
                             this.container
                                 .style('position', 'fixed')
                                 .style('top', 0);
-                            this.chart.attr('transform', `translate(0, ${this.visibleHeight() * dims.top})`);
+                            this.chart.attr('transform', `translate(-1, ${this.visibleHeight() * dims.top})`);
                         });
                 } else if (this._state === 'ontable') {
                     bars = bars.transition().duration(500);
@@ -201,11 +201,13 @@ export class BarChartView extends View {
                         .style('position', 'absolute')
                         .style('top', 0);
                     const startY = this.visibleHeight() * oldDims.top + window.scrollY;
-                    this.chart.attr('transform', `translate(0, ${startY})`);
+                    this.chart.attr('transform', `translate(-1, ${startY})`);
                 } else if (['faded', 'done'].includes(this._state)) {
                     this.container
                         .style('position', 'absolute')
                         .style('top', this.thresholds[3].calcFunction());
+                } else {
+                    bars = bars.transition().duration(500);
                 }
             }
             this.moveBars(bars, posParams);
@@ -334,15 +336,14 @@ export class BarChartView extends View {
     chartTopPosition(changed) {
         let dimsTop = this.dims[this.orientation()][this._state].top;
         let fixedTop = dimsTop * this.visibleHeight();
-        // if (['faded', 'done'].includes(this._state)) {
-        //     return fixedTop - (window.scrollY - this.thresholds[3].calcFunction());
-        // }
-        if (changed && this._state === 'focused') {
+
+        if (changed && changed.from === 'ontable' && changed.to === 'focused') {
             return fixedTop + window.scrollY;
         }
-        // if (changed && changed.from === 'focused' && changed.to === 'ontable') {
-        //     return fixedTop + window.scrollY;
-        // }
+        if (changed && changed.from === 'faded' && changed.to === 'focused') {
+            return fixedTop + window.scrollY - this.thresholds[3].calcFunction();
+        }
+
         return fixedTop;
     }
 
