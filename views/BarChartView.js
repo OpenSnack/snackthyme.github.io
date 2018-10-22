@@ -184,16 +184,28 @@ export class BarChartView extends View {
                 bars = bars.transition().duration(500);
                 bars = bars.ease(d3.easeCubicOut);
             } else if (changed) {
-                bars = bars.transition().duration(500);
                 if (this._state === 'focused') {
-                    bars.on('end', () => {
-                        this.container.style('position', 'fixed');
-                        this.chart.attr('transform', `translate(0, ${this.visibleHeight() * dims.top})`);
-                    });
+                    bars = bars
+                      .transition()
+                      .duration(500)
+                        .on('end', () => {
+                            this.container
+                                .style('position', 'fixed')
+                                .style('top', 0);
+                            this.chart.attr('transform', `translate(0, ${this.visibleHeight() * dims.top})`);
+                        });
                 } else if (this._state === 'ontable') {
+                    bars = bars.transition().duration(500);
                     const oldDims = this.dims[this.orientation()]['focused'];
-                    this.container.style('position', 'absolute');
-                    this.chart.attr('transform', `translate(0, ${this.visibleHeight() * oldDims.top + window.scrollY})`);
+                    this.container
+                        .style('position', 'absolute')
+                        .style('top', 0);
+                    const startY = this.visibleHeight() * oldDims.top + window.scrollY;
+                    this.chart.attr('transform', `translate(0, ${startY})`);
+                } else if (['faded', 'done'].includes(this._state)) {
+                    this.container
+                        .style('position', 'absolute')
+                        .style('top', this.thresholds[3].calcFunction());
                 }
             }
             this.moveBars(bars, posParams);
@@ -322,9 +334,9 @@ export class BarChartView extends View {
     chartTopPosition(changed) {
         let dimsTop = this.dims[this.orientation()][this._state].top;
         let fixedTop = dimsTop * this.visibleHeight();
-        if (['faded', 'done'].includes(this._state)) {
-            return fixedTop - (window.scrollY - this.thresholds[3].calcFunction());
-        }
+        // if (['faded', 'done'].includes(this._state)) {
+        //     return fixedTop - (window.scrollY - this.thresholds[3].calcFunction());
+        // }
         if (changed && this._state === 'focused') {
             return fixedTop + window.scrollY;
         }
