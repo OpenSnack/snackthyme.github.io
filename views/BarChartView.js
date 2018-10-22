@@ -112,7 +112,7 @@ export class BarChartView extends View {
         this.container.style('position', 'absolute');
         this.chart = this.container
           .append('g')
-            .attr('transform', `translate(0, ${dims.top * this.container.height()})`);
+            .attr('transform', `translate(-1, ${this.chartTopPosition()})`);
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
@@ -181,12 +181,12 @@ export class BarChartView extends View {
         // on resize, just move right away
         if (trigger !== 'resize') {
             if (trigger === 'sliderMoved') {
-                bars = bars.transition().duration(500);
+                bars = bars.transition('bar-chart-move').duration(500);
                 bars = bars.ease(d3.easeCubicOut);
             } else if (changed) {
                 if (this._state === 'focused') {
                     bars = bars
-                      .transition()
+                      .transition('bar-chart-move')
                       .duration(500)
                         .on('end', () => {
                             this.container
@@ -195,22 +195,26 @@ export class BarChartView extends View {
                             this.chart.attr('transform', `translate(-1, ${this.visibleHeight() * dims.top})`);
                         });
                 } else if (this._state === 'ontable') {
-                    bars = bars.transition().duration(500);
+                    bars = bars.transition('bar-chart-move').duration(500);
                     const oldDims = this.dims[this.orientation()]['focused'];
-                    this.container
-                        .style('position', 'absolute')
-                        .style('top', 0);
-                    const startY = this.visibleHeight() * oldDims.top + window.scrollY;
-                    this.chart.attr('transform', `translate(-1, ${startY})`);
+                    if (changed.from === 'focused') {
+                        this.container
+                            .style('position', 'absolute')
+                            .style('top', 0);
+                        const startY = this.visibleHeight() * oldDims.top + window.scrollY;
+                        this.chart.attr('transform', `translate(-1, ${startY})`);
+                    }
                 } else if (['faded', 'done'].includes(this._state)) {
                     this.container
                         .style('position', 'absolute')
                         .style('top', this.thresholds[3].calcFunction());
                 } else {
-                    bars = bars.transition().duration(500);
+                    bars = bars.transition('bar-chart-move').duration(500);
                 }
+                this.moveBars(bars, posParams);
+            } else if (!d3.active(bars.node(), 'bar-chart-move')) {
+                this.moveBars(bars, posParams);
             }
-            this.moveBars(bars, posParams);
         } else {
             this.moveBars(bars, posParams);
         }
@@ -335,6 +339,7 @@ export class BarChartView extends View {
 
     chartTopPosition(changed) {
         let dimsTop = this.dims[this.orientation()][this._state].top;
+
         let fixedTop = dimsTop * this.visibleHeight();
 
         if (changed && changed.from === 'ontable' && changed.to === 'focused') {
@@ -343,7 +348,6 @@ export class BarChartView extends View {
         if (changed && changed.from === 'faded' && changed.to === 'focused') {
             return fixedTop + window.scrollY - this.thresholds[3].calcFunction();
         }
-
         return fixedTop;
     }
 
