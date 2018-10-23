@@ -183,19 +183,17 @@ export class BarChartView extends View {
             if (trigger === 'sliderMoved') {
                 bars = bars.transition('bar-chart-move').duration(500);
                 bars = bars.ease(d3.easeCubicOut);
+                this.moveBars(bars, posParams);
             } else if (changed) {
+                bars = bars.transition('bar-chart-move').duration(500);
                 if (this._state === 'focused') {
-                    bars = bars
-                      .transition('bar-chart-move')
-                      .duration(500)
-                        .on('end', () => {
-                            this.container
-                                .style('position', 'fixed')
-                                .style('top', 0);
-                            this.chart.attr('transform', `translate(-1, ${this.visibleHeight() * dims.top})`);
-                        });
+                    bars.on('end', () => {
+                        this.container
+                            .style('position', 'fixed')
+                            .style('top', 0);
+                        this.chart.attr('transform', `translate(-1, ${this.visibleHeight() * dims.top})`);
+                    });
                 } else if (this._state === 'ontable') {
-                    bars = bars.transition('bar-chart-move').duration(500);
                     const oldDims = this.dims[this.orientation()]['focused'];
                     if (changed.from === 'focused') {
                         this.container
@@ -204,12 +202,10 @@ export class BarChartView extends View {
                         const startY = this.visibleHeight() * oldDims.top + window.scrollY;
                         this.chart.attr('transform', `translate(-1, ${startY})`);
                     }
-                } else if (['faded', 'done'].includes(this._state)) {
+                } else if (this._state === 'faded') {
                     this.container
                         .style('position', 'absolute')
                         .style('top', this.thresholds[3].calcFunction());
-                } else {
-                    bars = bars.transition('bar-chart-move').duration(500);
                 }
                 this.moveBars(bars, posParams);
             } else if (!d3.active(bars.node(), 'bar-chart-move')) {
