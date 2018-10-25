@@ -1,5 +1,8 @@
 #magic-svg-3 {
     position: relative;
+    /* for when fixed */
+    top: 0;
+    left: 0;
 }
 
 g.pathGroup path {

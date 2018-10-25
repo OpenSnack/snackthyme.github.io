@@ -33,7 +33,7 @@ export class MapView extends View {
                 done: {
                     width: 0.7,
                     height: 0.5,
-                    top: 2
+                    top: 0.4
                 }
             },
             portrait: {
@@ -60,7 +60,7 @@ export class MapView extends View {
                 done: {
                     width: 0.9,
                     height: 0.5,
-                    top: 2
+                    top: 0.4
                 }
             }
         };
@@ -201,16 +201,36 @@ export class MapView extends View {
     }
 
     translateMap(posParams, stateChanged) {
-        let states = Object.values(stateChanged || {});
-        if (states.length === 0 || states.includes('hover') || states.includes('done')) {
+        if (!stateChanged || stateChanged.to === 'hover' || stateChanged.to === 'done') {
             if (!d3.active(this.pathGroups.node(), 'map-translate')) {
-                this.pathGroups.attr('transform', `translate(-1, ${this.topPosition()})`);
+                this.pathGroups.attr('transform', `translate(-1, ${this.topPosition(stateChanged)})`);
+            }
+            if (stateChanged.to === 'hover') {
+                this.container.style('position', 'fixed');
+            }
+            if (stateChanged.to === 'done') {
+                this.container.style('position', null);
             }
         } else {
-            this.pathGroups
+            const transition = this.pathGroups
                 .transition('map-translate')
                 .duration(1000)
-                .call(scrollMatchingTween, this.topPosition.bind(this));
+                .call(scrollMatchingTween, () => this.topPosition(stateChanged));
+
+            if (stateChanged.from === 'splitbar' && stateChanged.to === 'focused') {
+                transition.on('end', () => {
+                    this.container.style('position', 'fixed');
+                    this.pathGroups.attr('transform', `translate(-1, ${this.topPosition(stateChanged)})`);
+                });
+            } else if (stateChanged.from === 'focused' && stateChanged.to === 'splitbar') {
+                transition.on('start', () => {
+                    const dims = this.dims[this.orientation()]['focused'];
+                    const fixedTop = this.visibleHeight() * dims.top;
+                    this.pathGroups
+                        .attr('transform', `translate(-1, ${fixedTop + window.scrollY - this.container.top()})`);
+                    this.container.style('position', null);
+                });
+            }
         }
     }
 
@@ -222,17 +242,25 @@ export class MapView extends View {
         }
     }
 
-    mapTopPosition() {
+    mapTopPosition(changed) {
         const dims = this.dims[this.orientation()][this._state];
-        return this.visibleHeight() * dims.top + window.scrollY - this.container.top();
+        const fixedTop = this.visibleHeight() * dims.top;
+
+        if (changed && changed.from === 'splitbar' && changed.to === 'focused') {
+            return fixedTop + window.scrollY - this.container.top();
+        }
+        if (this._state === 'done') {
+            return fixedTop + this.thresholds[4].calcFunction() - this.visibleOffset();
+        }
+        return fixedTop;
     }
 
-    topPosition() {
+    topPosition(changed) {
         const dims = this.dims[this.orientation()][this._state];
         if (['off', 'splitbar'].includes(this._state)) {
             return this.barTopPosition(dims);
         }
-        return this.mapTopPosition();
+        return this.mapTopPosition(changed);
     }
 
     drawBar(position, transition) {
