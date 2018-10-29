@@ -22,17 +22,17 @@ export class MapView extends View {
                 },
                 focused: {
                     width: 0.7,
-                    height: 0.5,
+                    height: 0.6,
                     top: 0.4
                 },
                 hover: {
                     width: 0.7,
-                    height: 0.5,
+                    height: 0.6,
                     top: 0.4
                 },
                 done: {
                     width: 0.7,
-                    height: 0.5,
+                    height: 0.6,
                     top: 0.4
                 }
             },
@@ -348,21 +348,39 @@ export class MapView extends View {
         return fixedTop;
     }
 
+    setProjection(posParams) {
+        const testProjection = d3.geoAlbers();
+        let mapPath = d3.geoPath().projection(testProjection);
+        const oldBounds = mapPath.bounds(this.model.json);
+
+        const projection = d3.geoAlbers();
+
+        // scale map to fit width defined in this.dims
+        let newScale = testProjection.scale() * posParams.chartWidth / (oldBounds[1][0] - oldBounds[0][0]);
+        testProjection.scale(newScale);
+        const newBounds = mapPath.bounds(this.model.json);
+
+        if (newBounds[1][1] - newBounds[0][1] > posParams.chartHeight) {
+            newScale = projection.scale() * posParams.chartHeight / (oldBounds[1][1] - oldBounds[0][1]);
+            projection.scale(newScale);
+        } else {
+            projection.scale(newScale);
+        }
+
+        projection.translate([
+            this.container.width() / 2,
+            (oldBounds[1][1] - oldBounds[0][1]) / 2
+        ]);
+
+        return mapPath.projection(projection);
+    }
+
     drawMap(posParams, transition) {
         const view = this;
         let pathGroups = this.pathGroups.selectAll('g.pathGroup');
         const datum = this.model.currentData()[this._selected];
 
-        const projection = d3.geoAlbers();
-        let mapPath = d3.geoPath().projection(projection);
-        const oldBounds = mapPath.bounds(this.model.json);
-        // scale map to fit width defined in this.dims
-        const newScale = projection.scale() * posParams.chartWidth / (oldBounds[1][0] - oldBounds[0][0]);
-        projection.scale(newScale);
-        projection.translate([
-            this.container.width() / 2,
-            (oldBounds[1][1] - oldBounds[0][1]) / 2
-        ]);
+        const mapPath = this.setProjection(posParams);
 
         pathGroups
             .data(datum.percents)
