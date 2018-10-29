@@ -399,14 +399,17 @@ export class MapView extends View {
 
                 if (transition) {
                     paths = paths
-                      .transition()
+                      .transition('bar-to-map')
                       .delay(i * 20)
-                      .duration(1000);
+                      .duration(1000)
+                        .attr('d', mapPath)
+                        .style('opacity', 0.6);
+                } else {
+                    paths.interrupt('bar-to-map');
+                    paths
+                        .attr('d', mapPath)
+                        .style('opacity', 0.6);
                 }
-
-                paths
-                    .attr('d', mapPath)
-                    .style('opacity', 0.6);
             });
     }
 
