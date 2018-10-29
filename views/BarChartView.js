@@ -212,6 +212,11 @@ export class BarChartView extends View {
                 this.moveBars(bars, posParams);
             }
         } else {
+            if (this._state === 'faded') {
+                this.container
+                    .style('position', 'absolute')
+                    .style('top', this.thresholds[3].calcFunction());
+            }
             this.moveBars(bars, posParams);
         }
 
