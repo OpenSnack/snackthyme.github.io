@@ -378,15 +378,17 @@ export class MapView extends View {
     drawMap(posParams, transition) {
         const view = this;
         let pathGroups = this.pathGroups.selectAll('g.pathGroup');
-        const datum = this.model.currentData()[this._selected];
-
         const mapPath = this.setProjection(posParams);
+
+        const datum = this.model.currentData()[this._selected];
+        const datumScale = d3.scaleLinear()
+            .domain([0, Math.max(...datum.percents)])
+            .range([0.3, 1]);
 
         pathGroups
             .data(datum.percents)
             .each(function(d, i) {
                 let paths = d3.select(this).selectAll('path'); // eslint-disable-line
-                const value = datum.currentRating * d;
                 const coords = view.model.getCoordsByIndex(i);
                 const features = [];
                 for (let j = 0; j < paths.size(); j++) {
@@ -403,12 +405,12 @@ export class MapView extends View {
                       .delay(i * 20)
                       .duration(1000)
                         .attr('d', mapPath)
-                        .style('opacity', 0.6);
+                        .style('opacity', datumScale(d));
                 } else {
                     paths.interrupt('bar-to-map');
                     paths
                         .attr('d', mapPath)
-                        .style('opacity', 0.6);
+                        .style('opacity', datumScale(d));
                 }
             });
     }
