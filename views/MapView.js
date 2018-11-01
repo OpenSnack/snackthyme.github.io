@@ -128,7 +128,10 @@ export class MapView extends View {
         this.model.json.features.forEach((feature, i) => {
             const group = this.pathGroups
               .append('g')
-                .classed('pathGroup', true);
+                .classed('pathGroup', true)
+                .on('mouseover', () => {
+                    this.model.setHover(i);
+                });
 
             this.model.getCoordsByIndex(i).forEach(() => {
                 group.append('path');
@@ -236,8 +239,10 @@ export class MapView extends View {
 
     draw(posParams, transition) {
         if (this.isMapState()) {
+            this.container.style('z-index', 998);
             this.drawMap(posParams, transition);
         } else {
+            this.container.style('z-index', null);
             this.drawBar(posParams, transition);
         }
     }

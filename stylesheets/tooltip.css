@@ -1,0 +1,29 @@
+#tooltip {
+    position: fixed;
+    pointer-events: none;
+    padding: 10px;
+    border-radius: 3px;
+    z-index: 999;
+
+    display: flex;
+    flex-direction: column;
+
+    /* remove these later */
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+#tooltip-row-container {
+    display: flex;
+}
+
+#tooltip-value-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#tooltip-value {
+    font-size: 2em;
+    font-weight: 300;
+}

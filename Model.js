@@ -6,6 +6,8 @@ export class Model {
         this.data = [];
         this._sliderValue = 0;
         this._selectedIndex = 0;
+        this._hovering = null;
+        this._months = 6;
     }
 
     loadData(csvFile, jsonFile) {
@@ -19,6 +21,7 @@ export class Model {
         return json(filename).then((json) => {
             this.json = json;
             this.setRandomMapData();
+            this.setRandomTimeData();
         });
     }
 
@@ -27,7 +30,9 @@ export class Model {
     }
 
     notify(params) {
-        this._observers.forEach((obs) => {obs.update(params || {});});
+        this._observers.forEach((obs) => {
+            obs.update(params || {});
+        });
     }
 
     getSingleFeature(featureI, polygonI) {
@@ -67,6 +72,21 @@ export class Model {
     setSelected(index) {
         this._selectedIndex = index;
         this.notify({trigger: 'barSelected'});
+    }
+
+    setHover(i) {
+        this._hovering = this._setTooltipData(i);
+        this.notify({matches: 'tooltip', trigger: 'tooltipHover'});
+    }
+
+    _setTooltipData(i) {
+        const feature = this.json.features[i];
+        const data = this.currentData()[this._selectedIndex];
+        return Object.assign({}, feature, data, {percent: data.percents[i]});
+    }
+
+    currentTooltipData() {
+        return this._hovering;
     }
 
     currentData() {
@@ -114,6 +134,18 @@ export class Model {
             );
 
             rowDict.percents = shuffle(distribution);
+        });
+    }
+
+    setRandomTimeData() {
+        this.data.forEach((rowDict) => {
+            rowDict.timePoints = Array.from(
+                {length: this.json.features.length},
+                () => Array.from(
+                    {length: this._months + 1},
+                    Math.random
+                ).sort()
+            );
         });
     }
 }

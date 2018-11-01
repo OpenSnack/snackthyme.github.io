@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 
-import {MultiChartView} from './MultiChartView';
 import {TableView} from './TableView';
 import {BarChartView} from './BarChartView';
 import {MapView} from './MapView';
 import {SliderView} from './SliderView';
+import {TooltipView} from './TooltipView';
 
 export class MagicView {
     constructor(model, container) {
@@ -21,19 +21,21 @@ export class MagicView {
         const barChartSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-2'));
         this.barChartView = new BarChartView(model, barChartSVG, this, {'maskID': this.tableView.textMaskID});
 
-        const mapMultiSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
-        this.mapView = new MapView(model, mapMultiSVG, this);
-        // this.multiChartView = new MultiChartView(model, mapMultiSVG, this);
+        const mapSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
+        this.mapView = new MapView(model, mapSVG, this);
 
         const sliderDiv = this.viewify(this.container.append('div').attr('id', 'slider'));
-        this.sliderView = new SliderView(model, sliderDiv);
+        this.sliderView = new SliderView(model, sliderDiv, this);
+
+        const tooltipDiv = this.viewify(this.container.append('div').attr('id', 'tooltip'));
+        this.tooltipView = new TooltipView(model, tooltipDiv, this).tag('tooltip');
 
         this.views = [
             this.tableView,
             this.barChartView,
             this.mapView,
-            // this.multiChartView,
-            this.sliderView
+            this.sliderView,
+            this.tooltipView
         ];
     }
 
@@ -45,6 +47,8 @@ export class MagicView {
             view.init();
         });
 
+        this.views.forEach((view) => {view.ready();});
+
         window.addEventListener('resize', () => this.update({trigger: 'resize'}));
         window.addEventListener('scroll', () => this.update({trigger: 'scroll'}));
         return this;
@@ -53,7 +57,9 @@ export class MagicView {
     update(params) {
         this.views.forEach((view) => {
             view.setHeight(document.body.clientHeight);
-            view.update(params);
+            if (!params.matches || view.matches(params.matches)) {
+                view.update(params);
+            }
         });
     }
 

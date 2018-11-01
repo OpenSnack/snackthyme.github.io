@@ -53,11 +53,13 @@ export class SliderView extends View {
             }
         });
 
+        this.update({});
+    }
+
+    ready() {
         this.slider.on('update', () => {
             this.model.setSliderValue(this.slider.get() * this.sliderMult);
         });
-
-        this.update({});
     }
 
     update(params) {

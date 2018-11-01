@@ -1,14 +1,20 @@
 import * as eachCons from 'each-cons';
 
-export class View {
+import {Observer} from '../Observer.js';
+
+export class View extends Observer {
     constructor(model, container, parent) {
-        this.model = model;
+        super(model);
         this.container = container;
         this.parent = parent;
         this.screenHeightRatio = 1; // feel free to change
     }
 
     init(callback) {
+
+    }
+
+    ready() {
 
     }
 
