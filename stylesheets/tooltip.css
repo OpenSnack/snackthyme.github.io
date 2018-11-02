@@ -21,9 +21,22 @@
 #tooltip-value-container {
     display: flex;
     flex-direction: column;
+    flex: 2;
 }
 
 #tooltip-value {
     font-size: 2em;
     font-weight: 300;
+}
+
+#tooltip-chart {
+    flex: 3;
+}
+
+#tooltip-chart path {
+    fill: none;
+    stroke: black;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }

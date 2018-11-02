@@ -60,6 +60,10 @@ export class SliderView extends View {
         this.slider.on('update', () => {
             this.model.setSliderValue(this.slider.get() * this.sliderMult);
         });
+
+        this.slider.on('end', () => {
+            this.model.sliderEnded();
+        });
     }
 
     update(params) {

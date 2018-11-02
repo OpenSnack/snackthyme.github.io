@@ -7,6 +7,7 @@ export class Model {
         this._sliderValue = 0;
         this._selectedIndex = 0;
         this._hovering = null;
+        this._maxGrowth = 0;
         this._months = 6;
     }
 
@@ -22,6 +23,7 @@ export class Model {
             this.json = json;
             this.setRandomMapData();
             this.setRandomTimeData();
+            this._setMaxGrowth();
         });
     }
 
@@ -69,8 +71,13 @@ export class Model {
         this.notify({trigger: 'sliderMoved', immediately: true});
     }
 
+    sliderEnded() {
+        this._setMaxGrowth();
+    }
+
     setSelected(index) {
         this._selectedIndex = index;
+        this._setMaxGrowth();
         this.notify({trigger: 'barSelected'});
     }
 
@@ -79,10 +86,21 @@ export class Model {
         this.notify({matches: 'tooltip', trigger: 'tooltipHover'});
     }
 
+    _setMaxGrowth() {
+        const data = this.currentData()[this._selectedIndex];
+        const growths = data.percents.map((percent) => {
+            return Math.round((data.currentRating - Number(data.Rating)) * percent);
+        });
+        this._maxGrowth = Math.max(...growths);
+        if (this._maxGrowth <= 0) {
+            this._maxGrowth = Math.min(...growths);
+        }
+    }
+
     _setTooltipData(i) {
         const feature = this.json.features[i];
         const data = this.currentData()[this._selectedIndex];
-        return Object.assign({}, feature, data, {percent: data.percents[i]});
+        return Object.assign({}, feature, data, {percent: data.percents[i], index: i});
     }
 
     currentTooltipData() {
@@ -100,6 +118,10 @@ export class Model {
         let rating = Number(d.Rating);
         let ratio = Number(d.Ratio);
         return rating + this._sliderValue * rating * ratio;
+    }
+
+    maxGrowth() {
+        return this._maxGrowth;
     }
 
     selectedDatum() {
@@ -141,10 +163,10 @@ export class Model {
         this.data.forEach((rowDict) => {
             rowDict.timePoints = Array.from(
                 {length: this.json.features.length},
-                () => Array.from(
-                    {length: this._months + 1},
+                () => [0, ...Array.from(
+                    {length: this._months - 1},
                     Math.random
-                ).sort()
+                ).sort(), 1]
             );
         });
     }

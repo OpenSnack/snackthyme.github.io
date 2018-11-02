@@ -15,5 +15,6 @@ module.exports = {
     ]
   },
 
-  mode: 'none'
+  mode: 'none',
+  devtool: 'eval-source-map'
 };

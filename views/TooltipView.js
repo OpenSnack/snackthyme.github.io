@@ -6,16 +6,20 @@ export class TooltipView extends View {
     constructor(model, container, parent) {
         super(model, container, parent);
 
-        this._months = 7;
+        this._months = 6;
     }
 
     init(callback) {
         this.createContainers();
 
-        this.xScale = d3.scaleOrdinal()
-            .domain(Array.from({length: this._months}, (v, k) => k));
+        this.xScale = d3.scaleLinear()
+            .domain([0, this._months]);
 
         this.yScale = d3.scaleLinear();
+
+        this.path = this.chart
+          .append('path')
+            .classed('tooltip-chart-line', true);
 
         // fix this stuff later
 
@@ -29,10 +33,6 @@ export class TooltipView extends View {
         this.title.text('Alaska');
         this.value.text('3000');
         this.growth.text('(+200)');
-        this.timePoints = Array.from(
-            {length: this._months + 1},
-            Math.random
-        ).sort();
 
         this.update();
     }
@@ -45,12 +45,27 @@ export class TooltipView extends View {
             this.value.text(Math.round(data.currentRating * data.percent));
 
             const growth = Math.round((data.currentRating - Number(data.Rating)) * data.percent);
-            const sign = Math.sign(growth) === 1 ? '+' : '';
+            const sign = Math.sign(growth) >= 0 ? '+' : '';
             this.growth.text(`(${sign}${growth})`);
-        }
 
-        // this.xScale.range([0, this.chart.node().getBoundingClientRect().width]);
-        // this.yScale.domain()
+            const chartRect = this.chart.node().getBoundingClientRect();
+            const maxGrowth = this.model.maxGrowth();
+            this.xScale.range([0, chartRect.width]);
+            this.yScale
+                .domain([0, maxGrowth].sort())
+                .range([chartRect.height, 0]);
+
+            const line = d3.line()
+                .x((d, i) => this.xScale(i))
+                .y((d) => this.yScale(d))
+                .curve(d3.curveNatural);
+
+            const pathData = data.timePoints[data.index].map((point) => point * growth);
+
+            this.path
+                .datum(pathData)
+                .attr('d', line);
+        }
     }
 
     createContainers() {
