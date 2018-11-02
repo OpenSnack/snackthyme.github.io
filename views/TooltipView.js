@@ -25,14 +25,7 @@ export class TooltipView extends View {
 
         this.container
             .style('width', 200)
-            .style('height', 80);
-
-        this.chart
-            .style('height', 60);
-
-        this.title.text('Alaska');
-        this.value.text('3000');
-        this.growth.text('(+200)');
+            .style('height', 100);
 
         this.update();
     }
@@ -69,15 +62,19 @@ export class TooltipView extends View {
     }
 
     createContainers() {
-        this.title = this.container
+        this.chart = this.container
+          .append('svg')
+            .attr('id', 'tooltip-chart');
+
+        const textContainer = this.container
+          .append('div')
+            .attr('id', 'tooltip-text-container');
+
+        this.title = textContainer
           .append('div')
             .attr('id', 'tooltip-title');
 
-        const rowContainer = this.container
-          .append('div')
-            .attr('id', 'tooltip-row-container');
-
-        const valueContainer = rowContainer
+        const valueContainer = textContainer
           .append('div')
             .attr('id', 'tooltip-value-container');
 
@@ -88,9 +85,5 @@ export class TooltipView extends View {
         this.growth = valueContainer
           .append('div')
             .attr('id', 'tooltip-growth');
-
-        this.chart = rowContainer
-          .append('svg')
-            .attr('id', 'tooltip-chart');
     }
 }
