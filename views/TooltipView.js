@@ -21,16 +21,36 @@ export class TooltipView extends View {
           .append('path')
             .classed('tooltip-chart-line', true);
 
-        // fix this stuff later
-
-        this.container
-            .style('width', 200)
-            .style('height', 100);
-
-        this.update();
+        this.update({});
     }
 
     update(params) {
+        const {trigger} = params;
+
+        if (trigger === 'tooltipEnd') {
+            this.container
+                .style('top', null)
+                .style('left', null);
+        } else if (trigger && trigger.startsWith('tooltip')) {
+            this.updatePosition();
+
+            if (!trigger.startsWith('tooltipMove')) {
+                this.updateData();
+            }
+        }
+    }
+
+    updatePosition() {
+        const cursorPadding = 10;
+        const origin = this.model.tooltipOrigin();
+        const box = this.container.node().getBoundingClientRect();
+
+        this.container
+            .style('left', `${origin[0] - box.width / 2}px`)
+            .style('top', `${origin[1] - box.height - cursorPadding}px`);
+    }
+
+    updateData() {
         const data = this.model.currentTooltipData();
 
         if (data) {

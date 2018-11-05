@@ -120,6 +120,7 @@ export class MapView extends View {
     }
 
     init(callback) {
+        const view = this;
         this.buildDefs();
         this.pathGroups = this.container
           .append('g')
@@ -129,8 +130,21 @@ export class MapView extends View {
             const group = this.pathGroups
               .append('g')
                 .classed('pathGroup', true)
-                .on('mouseover', () => {
-                    this.model.setHover(i);
+                .on('mouseenter', () => {
+                    this.model.setHover(i, d3.mouse(this.container.node()), false);
+                })
+                .on('mousemove', () => {
+                    this.model.moveHover(d3.mouse(this.container.node()));
+                })
+                // .on('touchstart', () => {
+                //     this.model.setHover(i, d3.touches(this.container.node())[0], true);
+                // })
+                // .on('touchmove', () => {
+                //     d3.event.preventDefault(); // prevent scrolling
+                //     this.model.moveHover(d3.touches(this.container.node())[0], true);
+                // })
+                .on('mouseleave touchend', () => {
+                    this.model.endHover();
                 });
 
             this.model.getCoordsByIndex(i).forEach(() => {

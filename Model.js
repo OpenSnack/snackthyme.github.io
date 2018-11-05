@@ -81,9 +81,21 @@ export class Model {
         this.notify({trigger: 'barSelected'});
     }
 
-    setHover(i) {
+    setHover(i, origin, wasTouch) {
         this._hovering = this._setTooltipData(i);
-        this.notify({matches: 'tooltip', trigger: 'tooltipHover'});
+        this._origin = origin;
+        const trigger = wasTouch ? 'tooltipTouch' : 'tooltipHover';
+        this.notify({matches: 'tooltip', trigger: trigger});
+    }
+
+    moveHover(origin, wasTouch) {
+        const trigger = wasTouch ? 'tooltipMoveTouch' : 'tooltipMoveHover';
+        this._origin = origin;
+        this.notify({matches: 'tooltip', trigger: trigger});
+    }
+
+    endHover() {
+        this.notify({matches: 'tooltip', trigger: 'tooltipEnd'});
     }
 
     _setMaxGrowth() {
@@ -122,6 +134,10 @@ export class Model {
 
     maxGrowth() {
         return this._maxGrowth;
+    }
+
+    tooltipOrigin() {
+        return this._origin;
     }
 
     selectedDatum() {
