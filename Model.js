@@ -61,6 +61,10 @@ export class Model {
         return geometry.coordinates.map((c) => c[0]);
     }
 
+    getFeatureIndexById(id) {
+        return this.json.features.findIndex((f) => f.id === id);
+    }
+
     setSliderValue(value) {
         this._sliderValue = value;
         this.notify({trigger: 'sliderMoved', immediately: false});

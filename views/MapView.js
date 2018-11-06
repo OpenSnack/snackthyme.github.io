@@ -136,13 +136,6 @@ export class MapView extends View {
                 .on('mousemove', () => {
                     this.model.moveHover(d3.mouse(this.container.node()));
                 })
-                // .on('touchstart', () => {
-                //     this.model.setHover(i, d3.touches(this.container.node())[0], true);
-                // })
-                // .on('touchmove', () => {
-                //     d3.event.preventDefault(); // prevent scrolling
-                //     this.model.moveHover(d3.touches(this.container.node())[0], true);
-                // })
                 .on('mouseleave touchend', () => {
                     this.model.endHover();
                 });
@@ -151,6 +144,21 @@ export class MapView extends View {
                 group.append('path');
             });
         });
+
+        this.container
+            .on('touchstart touchmove', function() {
+                d3.event.preventDefault(); // prevent scrolling
+                const path = d3.select(document.elementFromPoint(...d3.touches(this)[0]));
+                if (!path.node() || path.attr('id') === view.container.attr('id')) {
+                    view.model.endHover();
+                } else {
+                    const hoverI = view.model.getFeatureIndexById(path.datum().id);
+                    view.model.setHover(hoverI, d3.touches(this)[0], true);
+                }
+            })
+            .on('touchend', () => {
+                this.model.endHover();
+            });
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
