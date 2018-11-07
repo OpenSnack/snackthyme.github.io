@@ -6,6 +6,10 @@ body {
     background-attachment: fixed;
 }
 
+#magic-container {
+    position: relative;
+}
+
 #magic-container svg {
     width: 100%;
 }

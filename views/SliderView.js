@@ -38,6 +38,10 @@ export class SliderView extends View {
         this._state = 'off';
     }
 
+    setHeight() {
+        return false;
+    }
+
     init(callback) {
         this.slider = noUiSlider.create(this.container.node(), {
             start: [0],

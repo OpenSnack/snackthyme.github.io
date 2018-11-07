@@ -9,6 +9,10 @@ export class TooltipView extends View {
         this._months = 6;
     }
 
+    setHeight() {
+        return false;
+    }
+
     init(callback) {
         this.createContainers();
 

@@ -23,7 +23,7 @@ export class View extends Observer {
     }
 
     setHeight(screenHeight) {
-        this.container.attr('height', screenHeight * this.screenHeightRatio);
+        this.container.style('height', `${screenHeight * this.screenHeightRatio}px`);
     }
 
     visibleHeight() {

@@ -5,15 +5,13 @@ import {BarChartView} from './BarChartView';
 import {MapView} from './MapView';
 import {SliderView} from './SliderView';
 import {TooltipView} from './TooltipView';
+import {FinalView} from './FinalView';
 
 export class MagicView {
     constructor(model, container) {
         this.model = model;
         this.container = container;
         this.caption = this.container.select('#caption');
-
-        this._svgSizeMult = 5;
-        const mult = this._svgSizeMult;
 
         const tableSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-1'));
         this.tableView = new TableView(model, tableSVG, this);
@@ -27,6 +25,9 @@ export class MagicView {
         const sliderDiv = this.viewify(this.container.append('div').attr('id', 'slider'));
         this.sliderView = new SliderView(model, sliderDiv, this);
 
+        const finalDiv = this.viewify(this.container.append('div').attr('id', 'final'));
+        this.finalView = new FinalView(model, finalDiv, this);
+
         const tooltipDiv = this.viewify(this.container.append('div').attr('id', 'tooltip'));
         this.tooltipView = new TooltipView(model, tooltipDiv, this).tag('tooltip');
 
@@ -35,17 +36,18 @@ export class MagicView {
             this.barChartView,
             this.mapView,
             this.sliderView,
-            this.tooltipView
+            this.tooltipView,
+            this.finalView
         ];
     }
 
     init() {
         this.model.addObserver(this);
-        this.container.style('height', document.body.clientHeight * this._svgSizeMult + 'px');
         this.views.forEach((view) => {
             view.setHeight(document.body.clientHeight);
             view.init();
         });
+        this.container.style('height', this.bodyHeight());
 
         this.views.forEach((view) => {view.ready();});
 
@@ -57,10 +59,19 @@ export class MagicView {
     update(params) {
         this.views.forEach((view) => {
             view.setHeight(document.body.clientHeight);
+        });
+        this.container.style('height', this.bodyHeight());
+        this.views.forEach((view) => {
             if (!params.matches || view.matches(params.matches)) {
                 view.update(params);
             }
         });
+    }
+
+    bodyHeight() {
+        let tableSVG = this.tableView.container;
+        let mapSVG = this.mapView.container;
+        return tableSVG.height() + mapSVG.height() + document.body.clientHeight;
     }
 
     viewify(selection) {
