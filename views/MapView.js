@@ -50,17 +50,17 @@ export class MapView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.4
+                    top: 0.5
                 },
                 hover: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.4
+                    top: 0.5
                 },
                 done: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.4
+                    top: 0.5
                 }
             }
         };
@@ -145,6 +145,7 @@ export class MapView extends View {
             });
         });
 
+        /* eslint-disable */
         this.container
             .on('touchstart touchmove', function() {
                 d3.event.preventDefault(); // prevent scrolling
@@ -159,6 +160,7 @@ export class MapView extends View {
             .on('touchend', () => {
                 this.model.endHover();
             });
+        /* eslint-enable */
 
         this.xScale = d3.scaleLinear().domain([0, this._redThreshold * 1.5]).clamp(true);
         this.yScale = d3.scaleBand().domain(this.model.data.map((rowDict) => rowDict.ID));
@@ -394,12 +396,15 @@ export class MapView extends View {
             projection.scale(newScale);
         }
 
+        const outPath = mapPath.projection(projection);
+        const outBounds = mapPath.bounds(this.model.json);
+
         projection.translate([
             this.container.width() / 2,
-            (oldBounds[1][1] - oldBounds[0][1]) / 2
+            (outBounds[1][1] - outBounds[0][1]) / 2
         ]);
 
-        return mapPath.projection(projection);
+        return outPath;
     }
 
     drawMap(posParams, transition) {

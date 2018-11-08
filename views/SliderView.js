@@ -11,12 +11,12 @@ export class SliderView extends View {
             landscape: {
                 width: 0.5,
                 scrollTop: 0.6,
-                top: 0.85
+                top: 0.8
             },
             portrait: {
                 width: 0.9,
                 scrollTop: 0.6,
-                top: 0.85
+                top: 0.8
             }
         };
 

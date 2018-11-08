@@ -4,6 +4,7 @@ body {
     font-weight: 200;
     background-image: linear-gradient(to top, rgb(255,141,0) 0%, rgb(134,0,216) 100%);
     background-attachment: fixed;
+    overflow-anchor: none;
 }
 
 #magic-container {

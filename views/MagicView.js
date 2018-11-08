@@ -13,22 +13,22 @@ export class MagicView {
         this.container = container;
         this.caption = this.container.select('#caption');
 
-        const tableSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-1'));
+        const tableSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-1'));
         this.tableView = new TableView(model, tableSVG, this);
 
-        const barChartSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-2'));
+        const barChartSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-2'));
         this.barChartView = new BarChartView(model, barChartSVG, this, {'maskID': this.tableView.textMaskID});
 
-        const mapSVG = this.viewify(this.container.append('svg').attr('id', 'magic-svg-3'));
+        const mapSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-3'));
         this.mapView = new MapView(model, mapSVG, this);
 
-        const sliderDiv = this.viewify(this.container.append('div').attr('id', 'slider'));
+        const sliderDiv = this.viewify(this.container.insert('div', '#final').attr('id', 'slider'));
         this.sliderView = new SliderView(model, sliderDiv, this);
 
-        const finalDiv = this.viewify(this.container.append('div').attr('id', 'final'));
+        const finalDiv = this.viewify(d3.select('#final'));
         this.finalView = new FinalView(model, finalDiv, this);
 
-        const tooltipDiv = this.viewify(this.container.append('div').attr('id', 'tooltip'));
+        const tooltipDiv = this.viewify(this.container.insert('div', '#final').attr('id', 'tooltip'));
         this.tooltipView = new TooltipView(model, tooltipDiv, this).tag('tooltip');
 
         this.views = [
