@@ -15,6 +15,16 @@ export class FinalView extends View {
         ];
     }
 
+    topPoints() {
+        return [
+            {
+                point: () => this.parent.container.node().getBoundingClientRect().height -
+                                this.container.node().getBoundingClientRect().height / 3,
+                major: true
+            }
+        ];
+    }
+
     init(callback) {
 
     }

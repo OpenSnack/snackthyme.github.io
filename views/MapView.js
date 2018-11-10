@@ -119,6 +119,26 @@ export class MapView extends View {
         this._selected = -1;
     }
 
+    topPoints() {
+        return [
+            {
+                point: () => this.visibleOffset() +
+                                this.visibleHeight() * (this.dims[this.orientation()]['splitbar'].top),
+                major: false
+            },
+            {
+                point: () => this.thresholds[2].calcFunction() +
+                                this.visibleHeight() * (this.dims[this.orientation()]['focused'].top),
+                major: true
+            },
+            {
+                point: () => this.thresholds[3].calcFunction() +
+                                this.visibleHeight() * (this.dims[this.orientation()]['hover'].top),
+                major: true
+            }
+        ];
+    }
+
     init(callback) {
         const view = this;
         this.buildDefs();

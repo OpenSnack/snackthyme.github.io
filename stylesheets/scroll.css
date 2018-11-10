@@ -1,0 +1,21 @@
+#magic-container #scroll {
+    position: absolute;
+    top: 0;
+    left: 50px;
+    width: 15px;
+}
+
+.svg-scroll-line {
+    stroke: white;
+    stroke-width: 2px;
+    opacity: 0.3;
+    stroke-dasharray: 10 5;
+    shape-rendering: crispEdges;
+}
+
+.svg-scroll-point {
+    opacity: 0.5;
+    width: 15px;
+    height: 15px;
+    fill: white;
+}

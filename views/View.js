@@ -22,6 +22,10 @@ export class View extends Observer {
         // do something with model data and put results into svg
     }
 
+    topPoints() {
+
+    }
+
     setHeight(screenHeight) {
         this.container.style('height', `${screenHeight * this.screenHeightRatio}px`);
     }

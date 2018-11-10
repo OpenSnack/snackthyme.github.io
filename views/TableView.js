@@ -64,6 +64,15 @@ export class TableView extends View {
         this.textMaskID = `${this.textID}-mask`;
     }
 
+    topPoints() {
+        return [
+            {
+                point: () => this.visibleHeight() * 0.25,
+                major: true
+            }
+        ];
+    }
+
     init(callback) {
         const dims = this.dims[this.orientation()];
 

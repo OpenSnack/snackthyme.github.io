@@ -6,6 +6,7 @@ import {MapView} from './MapView';
 import {SliderView} from './SliderView';
 import {TooltipView} from './TooltipView';
 import {FinalView} from './FinalView';
+import {ScrollIndicator} from './ScrollIndicator';
 
 export class MagicView {
     constructor(model, container) {
@@ -31,13 +32,29 @@ export class MagicView {
         const tooltipDiv = this.viewify(this.container.insert('div', '#final').attr('id', 'tooltip'));
         this.tooltipView = new TooltipView(model, tooltipDiv, this).tag('tooltip');
 
+        const pointViews = [
+            this.tableView,
+            this.barChartView,
+            this.mapView,
+            this.finalView
+        ];
+
+        let points = [];
+        pointViews.forEach((view) => {
+            points = points.concat(view.topPoints());
+        });
+
+        const scrollDiv = this.viewify(this.container.insert('svg', '#final').attr('id', 'scroll'));
+        this.scrollIndicator = new ScrollIndicator(model, scrollDiv, this, points);
+
         this.views = [
             this.tableView,
             this.barChartView,
             this.mapView,
             this.sliderView,
             this.tooltipView,
-            this.finalView
+            this.finalView,
+            this.scrollIndicator
         ];
     }
 

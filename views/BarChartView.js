@@ -106,6 +106,20 @@ export class BarChartView extends View {
         this._transitioning = false;
     }
 
+    topPoints() {
+        return [
+            {
+                point: () => this.visibleHeight() * this.dims[this.orientation()]['ontable'].top,
+                major: false
+            },
+            {
+                point: () => this.thresholds[2].calcFunction() +
+                                this.visibleHeight() * this.dims[this.orientation()]['focused'].top,
+                major: true
+            }
+        ];
+    }
+
     init(callback) {
         const dims = this.dims[this.orientation()][this._state];
 
