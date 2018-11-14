@@ -10,21 +10,7 @@ export class ScrollIndicator extends View {
     }
 
     init(callback) {
-        this.line = this.container
-          .append('line')
-            .classed('svg-scroll-line', true)
-            .attr('x1', '50%')
-            .attr('x2', '50%')
-            .attr('y1', 0)
-            .attr('y2', '100%');
-
-        this.pointRects = this.container
-          .selectAll('rect.svg-scroll-point')
-          .data(this.points)
-          .enter()
-          .append('rect')
-            .classed('svg-scroll-point', true)
-            .classed('point-major', (d) => d.major);
+        this.buildRects();
     }
 
     update(params) {
@@ -37,5 +23,65 @@ export class ScrollIndicator extends View {
         this.pointRects
             .attr('x', 0)
             .attr('y', (d) => typeof d.point === 'function' ? d.point() : d.point);
+
+        this.pointMasks
+            .attr('x', 0)
+            .attr('y', (d) => typeof d.point === 'function' ? d.point() : d.point);
     }
+
+    buildRects() {
+        const defs = this.container
+          .append('defs');
+
+        this.pointRects = this.container
+          .selectAll('rect.svg-scroll-point')
+          .data(this.points)
+          .enter()
+          .append('rect')
+            .classed('svg-scroll-point', true)
+            .classed('point-major', (d) => d.major);
+
+        defs
+          .append('pattern')
+            .attr('id', 'svg-scroll-line-pattern')
+            .attr('width', '5')
+            .attr('height', '15')
+            .attr('patternUnits', 'userSpaceOnUse')
+          .append('rect')
+            .attr('id', 'svg-scroll-line-dotted')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', 5)
+            .attr('height', 10);
+
+        defs
+          .append('mask')
+            .attr('id', 'svg-scroll-point-mask')
+            .attr('maskContentUnits', 'userSpaceOnUse')
+          .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('fill', 'white');
+
+        this.pointMasks = defs
+          .select('mask')
+          .selectAll('rect.svg-scroll-point-mask-rect')
+          .data(this.points)
+          .enter()
+          .append('rect')
+            .classed('svg-scroll-point-mask-rect', true)
+            .classed('point-major', (d) => d.major);
+
+        this.line = this.container
+          .append('rect')
+            .classed('svg-scroll-line', true)
+            .attr('x', '40%')
+            .attr('y', 0)
+            .attr('width', '20%')
+            .attr('height', '100%')
+            .attr('fill', 'url(#svg-scroll-line-pattern)')
+            .attr('mask', 'url(#svg-scroll-point-mask)');
+        }
 }

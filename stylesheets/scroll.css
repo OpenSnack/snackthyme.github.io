@@ -6,10 +6,7 @@
 }
 
 .svg-scroll-line {
-    stroke: white;
-    stroke-width: 2px;
     opacity: 0.3;
-    stroke-dasharray: 10 5;
     shape-rendering: crispEdges;
 }
 
@@ -17,5 +14,14 @@
     opacity: 0.5;
     width: 15px;
     height: 15px;
+    fill: white;
+}
+
+.svg-scroll-point-mask-rect {
+    width: 15px;
+    height: 15px;
+}
+
+#svg-scroll-line-dotted {
     fill: white;
 }
