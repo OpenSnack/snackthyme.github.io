@@ -40,6 +40,8 @@ export class ScrollIndicator extends View {
             .attr('y', setY);
     }
 
+    setHeight() {}
+
     buildDefs() {
         const defs = this.container
           .append('defs');

@@ -168,11 +168,11 @@ export class MapView extends View {
         /* eslint-disable */
         this.container
             .on('touchstart touchmove', function() {
-                d3.event.preventDefault(); // prevent scrolling
                 const path = d3.select(document.elementFromPoint(...d3.touches(this)[0]));
-                if (!path.node() || path.attr('id') === view.container.attr('id')) {
+                if (!path.node() || path.node().tagName === 'svg') {
                     view.model.endHover();
                 } else {
+                    d3.event.preventDefault(); // prevent scrolling
                     const hoverI = view.model.getFeatureIndexById(path.datum().id);
                     view.model.setHover(hoverI, d3.touches(this)[0], true);
                 }
