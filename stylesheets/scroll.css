@@ -3,6 +3,7 @@
     top: 0;
     left: 50px;
     width: 15px;
+    z-index: 1000;
 }
 
 .svg-scroll-line {
@@ -24,4 +25,27 @@
 
 #svg-scroll-line-dotted {
     fill: white;
+}
+
+@media screen and (min-width: 1921px) {
+    
+}
+
+@media screen and (min-width: 2561px) {
+    #magic-container #scroll {
+        width: 30px;
+    }
+
+    .svg-scroll-point,
+    .svg-scroll-point-mask-rect {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* portrait phone styles */
+    #magic-container #scroll {
+        left: -5px;
+    }
 }

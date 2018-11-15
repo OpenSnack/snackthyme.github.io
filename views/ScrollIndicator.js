@@ -15,10 +15,13 @@ export class ScrollIndicator extends View {
 
     update(params) {
         this.container.style('height', this.parent.bodyHeight());
-        this.line
-            .attr('x', 5)
-            .attr('y', 0)
-            .attr('width', 5);
+
+        const pattern = this.container.select('#svg-scroll-line-pattern');
+        const patternRect = pattern.select('rect');
+        const patternRectHeight = Math.round(patternRect.node().getBBox().width * 2);
+
+        pattern.attr('height', patternRectHeight * 1.5);
+        patternRect.attr('height', patternRectHeight);
 
         this.pointRects
             .attr('x', 0)
@@ -44,14 +47,14 @@ export class ScrollIndicator extends View {
         defs
           .append('pattern')
             .attr('id', 'svg-scroll-line-pattern')
-            .attr('width', '5')
-            .attr('height', '15')
+            .attr('width', '100%')
+            .attr('height', '1%')
             .attr('patternUnits', 'userSpaceOnUse')
           .append('rect')
             .attr('id', 'svg-scroll-line-dotted')
-            .attr('x', 0)
+            .attr('x', '33%')
             .attr('y', 0)
-            .attr('width', 5)
+            .attr('width', '33%')
             .attr('height', 10);
 
         defs
@@ -77,9 +80,9 @@ export class ScrollIndicator extends View {
         this.line = this.container
           .append('rect')
             .classed('svg-scroll-line', true)
-            .attr('x', '40%')
+            .attr('x', '33%')
             .attr('y', 0)
-            .attr('width', '20%')
+            .attr('width', '33%')
             .attr('height', '100%')
             .attr('fill', 'url(#svg-scroll-line-pattern)')
             .attr('mask', 'url(#svg-scroll-point-mask)');
