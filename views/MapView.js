@@ -155,10 +155,14 @@ export class MapView extends View {
               .append('g')
                 .classed('pathGroup', true)
                 .on('mouseenter', () => {
-                    this.model.setHover(i, d3.mouse(this.container.node()), false);
+                    if (this._state === 'hover') {
+                        this.model.setHover(i, d3.mouse(this.container.node()), false);
+                    }
                 })
                 .on('mousemove', () => {
-                    this.model.moveHover(d3.mouse(this.container.node()));
+                    if (this._state === 'hover') {
+                        this.model.moveHover(d3.mouse(this.container.node()));
+                    }
                 })
                 .on('mouseleave touchend', () => {
                     this.model.endHover();
