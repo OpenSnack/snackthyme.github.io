@@ -23,17 +23,17 @@ export class MapView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.4
+                    top: 0.35
                 },
                 hover: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.4
+                    top: 0.35
                 },
                 done: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.4
+                    top: 0.35
                 }
             },
             portrait: {
@@ -90,7 +90,7 @@ export class MapView extends View {
                 text: 'What if you could',
                 coords: {
                     width: 0.9,
-                    top: 0.2,
+                    top: 0.15,
                     left: 0.05
                 }
             },
@@ -98,7 +98,7 @@ export class MapView extends View {
                 text: 'see the big picture?',
                 coords: {
                     width: 0.9,
-                    top: 0.27,
+                    top: 0.23,
                     left: 0.05
                 }
             },
@@ -106,7 +106,7 @@ export class MapView extends View {
                 text: 'clarify the details?',
                 coords: {
                     width: 0.9,
-                    top: 0.27,
+                    top: 0.23,
                     left: 0.05
                 }
             }
