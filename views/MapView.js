@@ -147,7 +147,8 @@ export class MapView extends View {
         this.buildDefs();
         this.pathGroups = this.container
           .append('g')
-            .attr('transform', 'translate(-1, 0)');
+            .attr('transform', 'translate(-1, 0)')
+            .attr('opacity', 0);
 
         this.model.json.features.forEach((feature, i) => {
             const group = this.pathGroups
