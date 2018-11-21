@@ -15,14 +15,13 @@ export class ScrollIndicator extends View {
     }
 
     update(params) {
-        function setY(d) {
-            return typeof d.point === 'function' ? d.point() : d.point;
-        }
+        this.pointRects.sort((a, b) => this.pointY(a) - this.pointY(b));
+        const activeIndex = this.activeIndex();
 
         this.container.style('height', this.parent.bodyHeight());
         this.container
           .select('#svg-scroll-line-cutoff')
-            .attr('y', setY(this.pointRects.data().slice(-1)[0]));
+            .attr('y', this.pointY(this.pointRects.data().slice(-1)[0]));
 
         const pattern = this.container.select('#svg-scroll-line-pattern');
         const patternRect = pattern.select('rect');
@@ -31,16 +30,30 @@ export class ScrollIndicator extends View {
         pattern.attr('height', patternRectHeight * 1.5);
         patternRect.attr('height', patternRectHeight);
 
+        // add 3 for difference between mask and rect with stroke
         this.pointRects
-            .attr('x', 0)
-            .attr('y', setY);
+            .attr('x', 3)
+            .attr('y', (d) => this.pointY(d) + 3)
+            .style('fill', (d, i) => i === activeIndex ? null : 'rgba(255, 255, 255, 0)');
 
         this.pointMasks
             .attr('x', 0)
-            .attr('y', setY);
+            .attr('y', this.pointY);
     }
 
     setHeight() {}
+
+    pointY(d) {
+        return typeof d.point === 'function' ? d.point() : d.point;
+    }
+
+    activeIndex() {
+        const points = this.pointRects;
+        let subtr = points.data().length;
+        let i = points.data().reverse().findIndex((y) => this.pointY(y) <= window.scrollY);
+        if (i === -1) {return 0;}
+        return subtr - i;
+    }
 
     buildDefs() {
         const defs = this.container
