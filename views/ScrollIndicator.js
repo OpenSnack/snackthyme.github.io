@@ -85,7 +85,7 @@ export class ScrollIndicator extends View {
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('height', '99999px')
             .attr('fill', 'white');
 
         mask.append('rect')
