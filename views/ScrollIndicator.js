@@ -44,13 +44,17 @@ export class ScrollIndicator extends View {
     setHeight() {}
 
     pointY(d) {
-        return typeof d.point === 'function' ? d.point() : d.point;
+        return typeof d.displayPoint === 'function' ? d.displayPoint() : d.displayPoint;
+    }
+
+    pointOn(d) {
+        return typeof d.onPoint === 'function' ? d.onPoint() : d.onPoint;
     }
 
     activeIndex() {
         const points = this.pointRects;
-        let subtr = points.data().length;
-        let i = points.data().reverse().findIndex((y) => this.pointY(y) <= window.scrollY);
+        let subtr = points.data().length - 1;
+        let i = points.data().slice().reverse().findIndex((y) => window.scrollY >= this.pointOn(y));
         if (i === -1) {return 0;}
         return subtr - i;
     }

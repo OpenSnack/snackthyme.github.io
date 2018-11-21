@@ -109,12 +109,14 @@ export class BarChartView extends View {
     topPoints() {
         return [
             {
-                point: () => this.visibleHeight() * this.dims[this.orientation()]['ontable'].top,
+                displayPoint: () => this.visibleHeight() * this.dims[this.orientation()]['ontable'].top,
+                onPoint: this.thresholds[1].calcFunction,
                 major: false
             },
             {
-                point: () => this.thresholds[2].calcFunction() +
+                displayPoint: () => this.thresholds[2].calcFunction() +
                                 this.visibleHeight() * this.dims[this.orientation()]['focused'].top,
+                onPoint: this.thresholds[2].calcFunction,
                 major: true
             }
         ];

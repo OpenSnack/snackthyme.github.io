@@ -122,18 +122,21 @@ export class MapView extends View {
     topPoints() {
         return [
             {
-                point: () => this.visibleOffset() +
+                displayPoint: () => this.visibleOffset() +
                                 this.visibleHeight() * (this.dims[this.orientation()]['splitbar'].top),
+                onPoint: this.thresholds[1].calcFunction,
                 major: false
             },
             {
-                point: () => this.thresholds[2].calcFunction() +
+                displayPoint: () => this.thresholds[2].calcFunction() +
                                 this.visibleHeight() * (this.dims[this.orientation()]['focused'].top),
+                onPoint: this.thresholds[2].calcFunction,
                 major: true
             },
             {
-                point: () => this.thresholds[3].calcFunction() +
+                displayPoint: () => this.thresholds[3].calcFunction() +
                                 this.visibleHeight() * (this.dims[this.orientation()]['hover'].top),
+                onPoint: this.thresholds[3].calcFunction,
                 major: true
             }
         ];

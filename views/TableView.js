@@ -67,7 +67,8 @@ export class TableView extends View {
     topPoints() {
         return [
             {
-                point: () => this.visibleHeight() * 0.25,
+                displayPoint: () => this.visibleHeight() * 0.25,
+                onPoint: 0,
                 major: true
             }
         ];
