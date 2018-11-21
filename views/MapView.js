@@ -208,7 +208,8 @@ export class MapView extends View {
 
         const posParams = {
             chartWidth: this.container.width() * dims.width,
-            chartHeight: this.visibleHeight() * dims.height
+            chartHeight: this.visibleHeight() * dims.height,
+            trigger: trigger
         };
         posParams.centerLeftOffset = (this.container.width() - posParams.chartWidth) / 2;
         posParams.barRight = posParams.centerLeftOffset + posParams.chartWidth;
@@ -462,7 +463,9 @@ export class MapView extends View {
                         .attr('d', mapPath)
                         .style('opacity', datumScale(d));
                 } else {
-                    paths.interrupt('bar-to-map');
+                    if (posParams.trigger === 'resize') {
+                        paths.interrupt('bar-to-map');
+                    }
                     paths
                         .attr('d', mapPath)
                         .style('opacity', datumScale(d));
