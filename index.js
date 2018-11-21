@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import {MagicView} from './views/MagicView.js';
 import {Model} from './Model.js';
 
-window.scrollTo(0, 0);
+history.scrollRestoration = 'manual';
 
 const container = d3.select('#magic-container');
 
