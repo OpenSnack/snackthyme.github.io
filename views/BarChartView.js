@@ -203,7 +203,7 @@ export class BarChartView extends View {
             } else if (changed) {
                 bars = bars.transition('bar-chart-move').duration(500);
                 if (this._state === 'focused') {
-                    bars.on('end', () => {
+                    bars.on('end interrupt', () => {
                         this.container
                             .style('position', 'fixed')
                             .style('top', 0);
