@@ -25,12 +25,12 @@
     display: flex;
     align-items: center;
     text-decoration: none;
-    margin: 10px;
+    margin: 5px;
 }
 
 .social-link img {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
 }
 
 .social-link span {
@@ -49,12 +49,22 @@
         width: 150px;
         height: 150px;
     }
+
+    .social-link span {
+        font-size: 3em;
+        margin-left: 50px;
+    }
 }
 
 @media screen and (min-width: 2561px) {
     .social-link img {
         width: 200px;
         height: 200px;
+    }
+
+    .social-link span {
+        font-size: 4em;
+        margin-left: 60px;
     }
 }
 
@@ -66,7 +76,7 @@
     }
 
     .social-link span {
-        font-size: 1.5em;
+        font-size: 1.3em;
         margin-left: 20px;
     }
 }
