@@ -23,7 +23,7 @@ export class TooltipView extends View {
 
         this.path = this.chart
           .append('path')
-            .classed('tooltip-chart-line', true);
+            .attr('id', 'tooltip-chart-line');
 
         this.update({});
     }
@@ -71,6 +71,14 @@ export class TooltipView extends View {
             this.yScale
                 .domain([0, maxGrowth].sort())
                 .range([chartRect.height, 0]);
+
+            if (growth < 0) {
+                this.path.attr('class', 'negative');
+            } else if (growth > 0) {
+                this.path.attr('class', 'positive');
+            } else {
+                this.path.attr('class', null);
+            }
 
             const line = d3.line()
                 .x((d, i) => this.xScale(i))

@@ -9,7 +9,7 @@
 
     top: -9999px;
     left: -9999px;
-    background-color: white;
+    background-color: rgba(128, 128, 128, 0.8);
 
     width: 200px;
     height: 100px;
@@ -17,6 +17,8 @@
 
 #tooltip-text-container {
     margin: 10px;
+    color: white;
+    z-index: 1000;
 }
 
 #tooltip-value-container {
@@ -44,12 +46,20 @@
     flex: 3;
 }
 
-#tooltip-chart path {
+#tooltip-chart-line {
     fill: none;
-    stroke: black;
+    stroke: none;
     stroke-width: 2px;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+#tooltip-chart-line.positive {
+    stroke: rgb(100, 200, 255);
+}
+
+#tooltip-chart-line.negative {
+    stroke: rgb(255, 140, 100);
 }
 
 @media screen and (min-width: 1921px) {
