@@ -12,22 +12,58 @@ export class MagicView {
     constructor(model, container) {
         this.model = model;
         this.container = container;
+
+        const BAR_FADE_POINT = 1.7;
+        const MAP_FOCUS_POINT = 2;
+        const MAP_HOVER_POINT = 3;
+        const MAP_DONE_POINT = 4;
+
         this.caption = this.container.select('#caption');
 
         const tableSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-1'));
-        this.tableView = new TableView(model, tableSVG, this);
+        this.tableView = new TableView(
+            model, tableSVG, this,
+            {
+                heightMult: MAP_FOCUS_POINT
+            }
+        );
 
         const barChartSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-2'));
-        this.barChartView = new BarChartView(model, barChartSVG, this, {'maskID': this.tableView.textMaskID});
+        this.barChartView = new BarChartView(
+            model, barChartSVG, this,
+            {
+                maskID: this.tableView.textMaskID,
+                fadePoint: BAR_FADE_POINT,
+                donePoint: MAP_FOCUS_POINT
+            }
+        );
 
         const mapSVG = this.viewify(this.container.insert('svg', '#final').attr('id', 'magic-svg-3'));
-        this.mapView = new MapView(model, mapSVG, this);
+        this.mapView = new MapView(
+            model, mapSVG, this,
+            {
+                splitPoint: BAR_FADE_POINT,
+                focusPoint: MAP_FOCUS_POINT,
+                hoverPoint: MAP_HOVER_POINT,
+                donePoint: MAP_DONE_POINT
+            }
+        );
 
         const sliderDiv = this.viewify(this.container.insert('div', '#final').attr('id', 'slider'));
-        this.sliderView = new SliderView(model, sliderDiv, this);
+        this.sliderView = new SliderView(
+            model, sliderDiv, this,
+            {
+                offPoint: BAR_FADE_POINT
+            }
+        );
 
         const finalDiv = this.viewify(d3.select('#final'));
-        this.finalView = new FinalView(model, finalDiv, this);
+        this.finalView = new FinalView(
+            model, finalDiv, this,
+            {
+                onPoint: MAP_DONE_POINT
+            }
+        );
 
         const tooltipDiv = this.viewify(this.container.insert('div', '#final').attr('id', 'tooltip'));
         this.tooltipView = new TooltipView(model, tooltipDiv, this).tag('tooltip');

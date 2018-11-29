@@ -5,7 +5,7 @@ import {View} from './View.js';
 import {scrollMatchingTween} from '../scrollMatchingTween.js';
 
 export class MapView extends View {
-    constructor(model, container, parent) {
+    constructor(model, container, parent, params) {
         super(model, container, parent);
 
         this.dims = {
@@ -69,19 +69,19 @@ export class MapView extends View {
             {name: 'off', calcFunction: null},
             {
                 name: 'splitbar',
-                calcFunction: () => this.visibleHeight()
+                calcFunction: () => this.visibleHeight() * params.splitPoint
             },
             {
                 name: 'focused',
-                calcFunction: () => this.visibleHeight() * 1.3
+                calcFunction: () => this.visibleHeight() * params.focusPoint
             },
             {
                 name: 'hover',
-                calcFunction: () => this.visibleHeight() * 1.7
+                calcFunction: () => this.visibleHeight() * params.hoverPoint
             },
             {
                 name: 'done',
-                calcFunction: () => this.visibleHeight() * 2
+                calcFunction: () => this.visibleHeight() * params.donePoint
             },
         ];
 
@@ -113,8 +113,9 @@ export class MapView extends View {
         ];
 
         this._state = 'off';
-        this.screenHeightRatio = 2;
-        this.scrollOffset = 1.3;
+        this.screenHeightRatio = params.donePoint - params.splitPoint + 1;
+        this.scrollOffset = params.focusPoint;
+        this.splitPoint = params.splitPoint;
         this._redThreshold = 5000;
         this._selected = -1;
     }
@@ -401,7 +402,7 @@ export class MapView extends View {
     barTopPosition(dims) {
         let fixedTop = this.visibleHeight() * dims.top;
         if (this._state === 'off') {
-            return fixedTop - (this.visibleHeight() - window.scrollY);
+            return fixedTop - (this.visibleHeight() * this.splitPoint - window.scrollY);
         }
         return fixedTop;
     }

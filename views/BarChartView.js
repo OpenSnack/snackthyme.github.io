@@ -76,11 +76,11 @@ export class BarChartView extends View {
             },
             {
                 name: 'faded',
-                calcFunction: () => this.visibleHeight()
+                calcFunction: () => this.visibleHeight() * params.fadePoint
             },
             {
                 name: 'done',
-                calcFunction: () => this.visibleHeight() * 1.3
+                calcFunction: () => this.visibleHeight() * params.donePoint
             }
         ];
 

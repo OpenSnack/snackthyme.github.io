@@ -10,7 +10,7 @@ export class FinalView extends View {
             {name: 'off', calcFunction: null},
             {
                 name: 'on',
-                calcFunction: () => this.visibleHeight() * 2
+                calcFunction: () => this.visibleHeight() * params.onPoint
             }
         ];
     }

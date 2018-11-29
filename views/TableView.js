@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import {View} from './View.js';
 
 export class TableView extends View {
-    constructor(model, container, parent) {
+    constructor(model, container, parent, params) {
         super(model, container, parent);
 
         this.dims = {
@@ -59,7 +59,7 @@ export class TableView extends View {
         ];
 
         this._state = 'pageload';
-        this.screenHeightRatio = 1.3;
+        this.screenHeightRatio = params.heightMult;
         this.textID = 'svg-table-row';
         this.textMaskID = `${this.textID}-mask`;
     }

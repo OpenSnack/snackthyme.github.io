@@ -4,7 +4,7 @@ import * as noUiSlider from 'nouislider';
 import {View} from './View.js';
 
 export class SliderView extends View {
-    constructor(model, container, parent) {
+    constructor(model, container, parent, params) {
         super(model, container, parent);
 
         this.dims = {
@@ -28,7 +28,7 @@ export class SliderView extends View {
             },
             {
                 name: 'done',
-                calcFunction: (y) => document.body.clientHeight
+                calcFunction: (y) => document.body.clientHeight * params.offPoint
             }
         ];
 
