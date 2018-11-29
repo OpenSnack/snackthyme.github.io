@@ -505,12 +505,17 @@ export class MapView extends View {
     }
 
     setCaptions(changed) {
-        // do this kinda thing like two or three times
         let capOpacities = this.captionOpacities(window.scrollY);
-        let capTransition = changed;
         [this.captionTop, this.caption1, this.caption2].forEach((caption, i) => {
             this.setCaption(
-                Object.assign({}, this._captionParams[i], {opacity: capOpacities[i], transition: capTransition}),
+                Object.assign(
+                    {}, this._captionParams[i],
+                    {
+                        opacity: capOpacities[i],
+                        transition: changed,
+                        immediate: Object.values(changed).includes('done')
+                    }
+                ),
                 caption
             );
         });

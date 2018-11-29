@@ -51,16 +51,16 @@ export class View extends Observer {
             .style('left', params.coords.left * document.body.clientWidth + 'px')
             .html(params.text);
 
-        if (params.transition) {
+        if (params.transition && !params.immediate) {
             target
-              .transition()
+              .transition('caption-opacity')
               .duration(500)
                 .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         } else {
-            target
-            //   .transition()
-            //   .duration(1)
-                .style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
+            if (params.immediate && d3.active(target.node(), 'caption-opacity')) {
+                target.interrupt('caption-opacity');
+            }
+            target.style('opacity', typeof params.opacity !== 'undefined' ? params.opacity : 1);
         }
 
     }
