@@ -266,6 +266,9 @@ export class MapView extends View {
                 this.container.style('position', 'fixed');
             }
             if (stateChanged.to === 'done') {
+                if (d3.active(this.pathGroups.node(), 'map-translate')) {
+                    this.pathGroups.interrupt('map-translate');
+                }
                 this.container.style('position', null);
             }
         } else {
