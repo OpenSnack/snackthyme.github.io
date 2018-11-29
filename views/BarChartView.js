@@ -162,7 +162,17 @@ export class BarChartView extends View {
 
         let capOpacity = this.captionOpacity(window.scrollY);
         let capTransition = changed && Object.values(changed).includes('ontable');
-        this.setCaption(Object.assign({}, this._captionParams, {opacity: capOpacity, transition: capTransition}));
+        let immediate = changed && Object.values(changed).includes('done');
+        this.setCaption(
+            Object.assign(
+                {}, this._captionParams,
+                {
+                    opacity: capOpacity,
+                    transition: capTransition,
+                    immediate: immediate
+                }
+            )
+        );
 
         const dims = this.dims[this.orientation()][this._state];
 
