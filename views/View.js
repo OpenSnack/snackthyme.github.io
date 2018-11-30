@@ -42,13 +42,18 @@ export class View extends Observer {
         return document.body.clientWidth >= document.body.clientHeight ? 'landscape' : 'portrait';
     }
 
+
     setCaption(params, target) {
         target = target || this.caption;
 
+        function coordEval(coord) {
+            return typeof coord === 'function' ? coord() : coord;
+        }
+
         target
-            .style('width', params.coords.width * document.body.clientWidth + 'px')
-            .style('top', params.coords.top * document.body.clientHeight + 'px')
-            .style('left', params.coords.left * document.body.clientWidth + 'px')
+            .style('width', coordEval(params.coords.width) * document.body.clientWidth + 'px')
+            .style('top', coordEval(params.coords.top) * document.body.clientHeight + 'px')
+            .style('left', coordEval(params.coords.left) * document.body.clientWidth + 'px')
             .html(params.text);
 
         if (params.transition && !params.immediate) {

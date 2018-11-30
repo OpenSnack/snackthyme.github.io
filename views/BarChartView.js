@@ -90,7 +90,17 @@ export class BarChartView extends View {
                 width: 0.7,
                 top: 0.15,
                 left: 0.15
-            }
+            },
+        };
+
+        this._labelParams = {
+            text: 'Selected Ratings',
+            coords: {
+                width: () => this.dims[this.orientation()]['focused'].width,
+                top: () => this.dims[this.orientation()]['focused'].top,
+                left: () => 0.5 - this.dims[this.orientation()]['focused'].width / 2
+            },
+            style: 'label'
         };
 
         this.screenHeightRatio = 2;
@@ -137,6 +147,10 @@ export class BarChartView extends View {
           .append('span')
             .classed('caption', true);
 
+        this.label = this.parent.container
+          .append('span')
+            .classed('label', true);
+
         this.chart.selectAll('.svg-bar-chart-bar')
           .data(this.model.data.slice(0, this._numBars), (d) => d.id)
           .enter()
@@ -161,7 +175,9 @@ export class BarChartView extends View {
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(window.scrollY);
+        let labelOpacity = this._state === 'focused' ? 1 : 0;
         let capTransition = changed && Object.values(changed).includes('ontable');
+        let labelTransition = changed && Object.values(changed).includes('focused');
         let immediate = changed && Object.values(changed).includes('done');
         this.setCaption(
             Object.assign(
@@ -172,6 +188,17 @@ export class BarChartView extends View {
                     immediate: immediate
                 }
             )
+        );
+        this.setCaption(
+            Object.assign(
+                {}, this._labelParams,
+                {
+                    opacity: labelOpacity,
+                    transition: labelTransition,
+                    immediate: immediate
+                }
+            ),
+            this.label
         );
 
         const dims = this.dims[this.orientation()][this._state];

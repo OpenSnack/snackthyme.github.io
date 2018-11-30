@@ -63,9 +63,21 @@ body {
     text-align: center;
 }
 
+.label {
+    position: fixed;
+    color: white;
+    font-size: 1.5em;
+    transform: translate(0, -1em);
+    opacity: 0.8;
+}
+
 @media screen and (min-width: 1025px) {
     .caption {
         font-size: 4em;
+    }
+
+    .label {
+        font-size: 1.5em;
     }
 }
 
@@ -73,6 +85,10 @@ body {
     /* 1440p screens */
     .caption {
         font-size: 5em;
+    }
+
+    .label {
+        font-size: 2.5em;
     }
 }
 
@@ -94,6 +110,10 @@ body {
 
     .caption {
         font-size: 8em;
+    }
+
+    .label {
+        font-size: 3.5em;
     }
 }
 
@@ -120,6 +140,10 @@ body {
     .caption {
         font-size: 2em;
     }
+
+    .label {
+        font-size: 1em;
+    }
 }
 
 @media screen and (max-height: 480px) and (orientation: landscape) {
@@ -143,5 +167,9 @@ body {
 
     .caption {
         font-size: 2em;
+    }
+
+    .label {
+        font-size: 1em;
     }
 }
