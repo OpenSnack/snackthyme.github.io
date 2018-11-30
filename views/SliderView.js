@@ -24,13 +24,22 @@ export class SliderView extends View {
             {name: 'off', calcFunction: null},
             {
                 name: 'focused',
-                calcFunction: (y) => document.body.clientHeight * (this.dims[this.orientation()].scrollTop - 0.15)
+                calcFunction: () => document.body.clientHeight * (this.dims[this.orientation()].scrollTop - 0.15)
             },
             {
                 name: 'done',
-                calcFunction: (y) => document.body.clientHeight * params.offPoint
+                calcFunction: () => document.body.clientHeight * params.offPoint
             }
         ];
+
+        this._labelParams = {
+            text: 'motivation ➤',
+            coords: {
+                width: null,
+                top: () => this.dims[this.orientation()].top,
+                left: () => 0.5 + this.dims[this.orientation()].width / 8
+            },
+        };
 
         this.minimum = -100;
         this.maximum = 100;
@@ -57,6 +66,10 @@ export class SliderView extends View {
             }
         });
 
+        this.label = this.parent.container
+          .append('span')
+            .classed('label', true);
+
         this.update({});
     }
 
@@ -74,6 +87,21 @@ export class SliderView extends View {
         const {trigger} = params;
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
         const dims = this.dims[this.orientation()];
+
+        let labelOpacity = this._state === 'focused' ? 0.8 : 0;
+        let labelTransition = changed && Object.values(changed).includes('focused');
+        let immediate = changed && Object.values(changed).includes('done');
+        this.setCaption(
+            Object.assign(
+                {}, this._labelParams,
+                {
+                    opacity: labelOpacity,
+                    transition: labelTransition,
+                    immediate: immediate
+                }
+            ),
+            this.label
+        );
 
         const sliderWidth = document.body.clientWidth * dims.width;
         const sliderTop = document.body.clientHeight * dims.top;

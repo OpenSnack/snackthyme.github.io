@@ -54,6 +54,7 @@ export class View extends Observer {
             .style('width', coordEval(params.coords.width) * document.body.clientWidth + 'px')
             .style('top', coordEval(params.coords.top) * document.body.clientHeight + 'px')
             .style('left', coordEval(params.coords.left) * document.body.clientWidth + 'px')
+            .style('text-align', params.align ? params.align : 'center')
             .html(params.text);
 
         if (params.transition && !params.immediate) {

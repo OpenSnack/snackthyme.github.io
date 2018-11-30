@@ -99,7 +99,8 @@ export class BarChartView extends View {
                 width: () => this.dims[this.orientation()]['focused'].width,
                 top: () => this.dims[this.orientation()]['focused'].top,
                 left: () => 0.5 - this.dims[this.orientation()]['focused'].width / 2
-            }
+            },
+            align: 'left'
         };
 
         this.screenHeightRatio = 2;
