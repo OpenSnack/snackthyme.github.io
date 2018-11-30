@@ -5,14 +5,26 @@
     left: 0;
 }
 
+path.map-bar {
+    shape-rendering: crispEdges;
+}
+
 g.pathGroup path {
     fill: rgb(100,200,255);
     filter: url(#map-erode);
 }
 
+g.pathGroup path.hover-hint {
+    filter: url(#map-erode-hover-hint);
+}
+
 @media screen and (min-width: 1921px) {
     g.pathGroup path {
         filter: url(#map-erode-more);
+    }
+
+    g.pathGroup path.hover-hint {
+        filter: url(#map-erode-more-hover-hint);
     }
 }
 
@@ -20,9 +32,8 @@ g.pathGroup path {
     g.pathGroup path {
         filter: url(#map-erode-most);
     }
-}
 
-
-path.map-bar {
-    shape-rendering: crispEdges;
+    g.pathGroup path.hover-hint {
+        filter: url(#map-erode-most-hover-hint);
+    }
 }
