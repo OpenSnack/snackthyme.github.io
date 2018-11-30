@@ -33,7 +33,7 @@ export class SliderView extends View {
         ];
 
         this._labelParams = {
-            text: 'motivation ➤',
+            text: 'Motivation ➤',
             coords: {
                 width: null,
                 top: () => this.dims[this.orientation()].top,
@@ -90,7 +90,7 @@ export class SliderView extends View {
 
         let labelOpacity = this._state === 'focused' ? 0.8 : 0;
         let labelTransition = changed && Object.values(changed).includes('focused');
-        let immediate = changed && Object.values(changed).includes('done');
+        let immediate = changed && changed.to === 'done';
         this.setCaption(
             Object.assign(
                 {}, this._labelParams,

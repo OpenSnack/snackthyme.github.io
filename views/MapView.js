@@ -23,17 +23,17 @@ export class MapView extends View {
                 focused: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.35
+                    top: 0.3
                 },
                 hover: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.35
+                    top: 0.3
                 },
                 done: {
                     width: 0.7,
                     height: 0.6,
-                    top: 0.35
+                    top: 0.3
                 }
             },
             portrait: {
@@ -111,6 +111,25 @@ export class MapView extends View {
                 }
             }
         ];
+
+        this._labelParams = {
+            landscape: {
+                text: 'Rating change over time',
+                coords: {
+                    width: () => this.dims[this.orientation()]['focused'].width,
+                    top: 0.95,
+                    left: () => 0.5 - this.dims[this.orientation()]['focused'].width / 2
+                }
+            },
+            portrait: {
+                text: 'Rating change over time',
+                coords: {
+                    width: () => this.dims[this.orientation()]['focused'].width,
+                    top: 0.85,
+                    left: () => 0.5 - this.dims[this.orientation()]['focused'].width / 2
+                }
+            }
+        };
 
         this._state = 'off';
         this.screenHeightRatio = params.donePoint - params.splitPoint + 1;
@@ -203,6 +222,10 @@ export class MapView extends View {
         this.caption2 = this.parent.container
           .append('span')
             .classed('caption', true);
+
+        this.label = this.parent.container
+          .append('span')
+            .classed('label', true);
     }
 
     update(params) {
@@ -226,6 +249,19 @@ export class MapView extends View {
         this.translateMap(posParams, stateChanged);
         this.setCaptions(stateChanged);
 
+        let labelOpacity = ['focused', 'hover'].includes(this._state) ? 0.8 : 0;
+        let labelTransition = this.doLabelTransition(stateChanged);
+        this.setCaption(
+            Object.assign(
+                {}, this._labelParams[this.orientation()],
+                {
+                    opacity: labelOpacity,
+                    transition: labelTransition
+                }
+            ),
+            this.label
+        );
+
         let states = stateChanged ? Object.values(stateChanged) : [];
 
         if (stateChanged) {
@@ -243,6 +279,12 @@ export class MapView extends View {
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
+    }
+
+    doLabelTransition(changed) {
+        if (!changed) {return false;}
+        let states = Object.values(changed);
+        return states.includes('focused') || states.includes('hover');
     }
 
     isMapState() {
