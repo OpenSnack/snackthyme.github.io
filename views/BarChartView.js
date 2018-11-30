@@ -99,8 +99,7 @@ export class BarChartView extends View {
                 width: () => this.dims[this.orientation()]['focused'].width,
                 top: () => this.dims[this.orientation()]['focused'].top,
                 left: () => 0.5 - this.dims[this.orientation()]['focused'].width / 2
-            },
-            style: 'label'
+            }
         };
 
         this.screenHeightRatio = 2;
@@ -175,7 +174,7 @@ export class BarChartView extends View {
         const changed = this.updateState(window.scrollY); // do things that need to know the state AFTER this
 
         let capOpacity = this.captionOpacity(window.scrollY);
-        let labelOpacity = this._state === 'focused' ? 1 : 0;
+        let labelOpacity = this._state === 'focused' ? 0.8 : 0;
         let capTransition = changed && Object.values(changed).includes('ontable');
         let labelTransition = changed && Object.values(changed).includes('focused');
         let immediate = changed && Object.values(changed).includes('done');
