@@ -56,6 +56,13 @@ body {
     font-size: 2em;
 }
 
+#header-beta {
+    color: rgb(210, 142, 199);
+    padding-left: 0.3em;
+    align-self: flex-end;
+    font-size: 1.5em;
+}
+
 .caption {
     position: fixed;
     color: white;
@@ -92,6 +99,10 @@ body {
         font-size: 3em;
     }
 
+    #header-beta {
+        font-size: 2.25em;
+    }
+
     /* 1440p screens */
     .caption {
         font-size: 5em;
@@ -116,6 +127,10 @@ body {
 
     #logo-name {
         font-size: 4em;
+    }
+
+    #header-beta {
+        font-size: 3em;
     }
 
     .caption {
@@ -147,6 +162,10 @@ body {
         font-size: 1.5em;
     }
 
+    #header-beta {
+        font-size: 1.1em;
+    }
+
     .caption {
         font-size: 2em;
     }
@@ -175,6 +194,10 @@ body {
         font-size: 1.5em;
     }
 
+    #header-beta {
+        font-size: 1.1em;
+    }
+
     .caption {
         font-size: 2em;
     }
@@ -192,6 +215,10 @@ body {
 
     #logo-name {
         font-size: 4em;
+    }
+
+    #header-beta {
+        font-size: 3em;
     }
 
     .caption {
