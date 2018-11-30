@@ -37,3 +37,13 @@
         font-size: 1em;
     }
 }
+
+@media screen and (min-width: 1025px) and (orientation: portrait) {
+    .svg-table-header-text,
+    .svg-table-row-text,
+    .svg-table-row-mask-text,
+    .svg-bar-chart-mask-name,
+    .svg-bar-chart-mask-rating {
+        font-size: 3em;
+    }
+}

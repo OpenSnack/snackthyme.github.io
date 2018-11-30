@@ -50,17 +50,17 @@ export class MapView extends View {
                 focused: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.5
+                    top: 0.4
                 },
                 hover: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.5
+                    top: 0.4
                 },
                 done: {
                     width: 0.9,
                     height: 0.5,
-                    top: 0.5
+                    top: 0.4
                 }
             }
         };

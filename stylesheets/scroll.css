@@ -52,8 +52,25 @@
     }
 }
 
-@media screen and (max-width: 480px) {
-    /* portrait phone styles */
+@media screen and (min-width: 1025px) and (orientation: portrait) {
+    #magic-container #scroll {
+        width: 30px;
+    }
+
+    .svg-scroll-point {
+        width: 22px;
+        height: 22px;
+        stroke-width: 8px;
+    }
+
+    .svg-scroll-point-mask-rect {
+        width: 30px;
+        height: 30px;
+        transform: translate(0, -1px);
+    }
+}
+
+@media screen and (orientation: portrait) {
     #magic-container #scroll {
         left: -5px;
     }

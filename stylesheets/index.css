@@ -83,6 +83,15 @@ body {
 }
 
 @media screen and (min-width: 1921px) {
+    #header-logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    #logo-name {
+        font-size: 3em;
+    }
+
     /* 1440p screens */
     .caption {
         font-size: 5em;
@@ -96,8 +105,8 @@ body {
 @media screen and (min-width: 2561px) {
     /* 4K/very large screens */
     #header-logo {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 150px;
     }
 
     #header-fade {
@@ -106,7 +115,7 @@ body {
     }
 
     #logo-name {
-        font-size: 3em;
+        font-size: 4em;
     }
 
     .caption {
@@ -172,5 +181,30 @@ body {
 
     .label {
         font-size: 1em;
+    }
+}
+
+@media screen and (min-width: 1025px) and (orientation: portrait) {
+    #header-logo {
+        width: 150px;
+        height: 150px;
+    }
+
+    #logo-name {
+        font-size: 4em;
+    }
+
+    .caption {
+        font-size: 5em;
+    }
+
+    .label {
+        font-size: 3em;
+    }
+}
+
+@media screen and (orientation: portrait) {
+    #header-fade {
+        left: 0;
     }
 }

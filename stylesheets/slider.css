@@ -78,3 +78,19 @@
         font-size: 2em;
     }
 }
+
+@media screen and (min-width: 1025px) and (orientation: portrait) {
+    .noUi-target {
+        height: 48px;
+    }
+
+    .noUi-horizontal .noUi-handle {
+        height: 58px;
+        width: 70px;
+        right: -35px;
+    }
+
+    .noUi-value {
+        font-size: 2em;
+    }
+}
