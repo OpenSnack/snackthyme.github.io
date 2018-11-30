@@ -284,40 +284,48 @@ export class MapView extends View {
                     this.setHighlight(this.highlightID, 10);
                 }
             } else {
-                this.unsetHighlight();
+                this.unsetHighlight(this.highlightID);
             }
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
     }
 
-    getFilters() {
-        return this.container
-          .select('defs')
-          .selectAll('filter')
-          .filter(function() {
-              return d3.select(this).attr('id').endsWith('hover-hint'); /* eslint-disable-line */
-          })
-          .selectAll('feGaussianBlur');
+    getPathInfo(id) {
+        const highlightPaths = this.pathGroups.selectAll('path');
+        if (typeof highlightPaths.data()[0] === 'undefined') {return {};}
+
+        const highlightPath = highlightPaths
+          .filter((d) => d.id === id);
+
+        const datum = this.model.currentData()[this._selected];
+        const datumScale = d3.scaleLinear()
+            .domain([0, Math.max(...datum.percents)])
+            .range([0.3, 1]);
+        let pathDatum = d3.select(highlightPath.node().parentNode).datum();
+
+        return {
+            path: highlightPath,
+            scale: datumScale,
+            datum: pathDatum
+        };
     }
 
     setHighlight(id, radius) {
-        const highlightPath = this.pathGroups
-          .selectAll('path').filter((d) => d.id === id)
-            .classed('hover-hint', true);
-
-        const filters = this.getFilters();
+        const {path, scale, datum} = this.getPathInfo(id);
 
         /* eslint-disable */
-        filters
+        path
           .transition()
             .duration(500)
             .on('start', function pulse() {
                 d3.active(this)
-                    .attr('stdDeviation', radius)
+                    .style('fill', 'rgb(245, 113, 67)') // orange
+                    .style('opacity', '1')
                   .transition()
                     .duration(500)
-                    .attr('stdDeviation', 0)
+                    .style('fill', 'rgb(100,200,255)') // original blue
+                    .style('opacity', scale(datum))
                   .transition()
                     .duration(500)
                     .on('start', function() {
@@ -326,24 +334,26 @@ export class MapView extends View {
             });
         /* eslint-enable */
 
-        highlightPath
-            .on('mouseenter touchstart', () => {this.unsetHighlight(true);});
+        path
+            .on('mouseenter touchstart', () => {this.unsetHighlight(id, true);});
     }
 
-    unsetHighlight(interacted) {
+    unsetHighlight(id, interacted) {
         if (interacted) {
             this._firstTimeHover = false;
         }
 
-        this.getFilters()
-          .transition()
-            .duration(500)
-            .attr('stdDeviation', 0)
-            .on('end', () => {
-                this.pathGroups
-                  .selectAll('path')
-                    .classed('hover-hint', false);
-            });
+        const {path, scale, datum} = this.getPathInfo(id);
+        if (typeof datum !== 'undefined') {
+            path
+              .transition()
+                .duration(500)
+                .style('fill', 'rgb(100,200,255)') // original blue
+                .style('opacity', scale(datum))
+                .on('end', () => {
+                    path.classed('hover-hint', false);
+                });
+        }
     }
 
     doLabelTransition(changed) {
@@ -604,47 +614,13 @@ export class MapView extends View {
         const sizes = [['map-erode', 1], ['map-erode-more', 2], ['map-erode-most', 4]];
 
         sizes.forEach(([id, radius]) => {
-            const filter1 = defs
+            defs
               .append('filter')
-                .attr('id', id);
-
-            filter1
+                .attr('id', id)
               .append('feMorphology')
                 .attr('operator', 'erode')
                 .attr('in', 'SourceGraphic')
                 .attr('radius', radius);
-
-            const filter2 = defs
-              .append('filter')
-                .attr('id', `${id}-hover-hint`)
-                .attr('width', '1000%')
-                .attr('height', '1000%')
-                .attr('x', '-500%')
-                .attr('y', '-500%');
-
-            filter2
-              .append('feMorphology')
-                .attr('operator', 'erode')
-                .attr('in', 'SourceGraphic')
-                .attr('radius', radius);
-
-            filter2
-              .append('feGaussianBlur')
-                .attr('stdDeviation', 0)
-                .attr('result', 'coloredBlur');
-
-            const merge = filter2.append('feMerge');
-
-            for (let i = 0; i < glowStrength; i++) {
-                merge
-                  .append('feMergeNode')
-                    .attr('in', 'coloredBlur');
-            }
-
-
-            merge
-              .append('feMergeNode')
-                .attr('in', 'SourceGraphic');
         });
     }
 

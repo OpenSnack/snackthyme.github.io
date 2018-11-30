@@ -14,26 +14,14 @@ g.pathGroup path {
     filter: url(#map-erode);
 }
 
-g.pathGroup path.hover-hint {
-    filter: url(#map-erode-hover-hint);
-}
-
 @media screen and (min-width: 1921px) {
     g.pathGroup path {
         filter: url(#map-erode-more);
-    }
-
-    g.pathGroup path.hover-hint {
-        filter: url(#map-erode-more-hover-hint);
     }
 }
 
 @media screen and (min-width: 2561px) {
     g.pathGroup path {
         filter: url(#map-erode-most);
-    }
-
-    g.pathGroup path.hover-hint {
-        filter: url(#map-erode-most-hover-hint);
     }
 }
