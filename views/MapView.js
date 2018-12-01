@@ -195,6 +195,19 @@ export class MapView extends View {
             });
         });
 
+        this.pathGroups
+          .selectAll('g.pathGroup')
+            .each(function(d, i) {
+                let paths = d3.select(this).selectAll('path'); // eslint-disable-line
+                const coords = view.model.getCoordsByIndex(i);
+                const features = [];
+                for (let j = 0; j < paths.size(); j++) {
+                    features.push(view.model.getSingleFeature(i, j));
+                }
+
+                paths.data(features);
+            });
+
         /* eslint-disable */
         this.container
             .on('touchstart touchmove', function() {
@@ -349,7 +362,7 @@ export class MapView extends View {
         const {path, scale, datum} = this.getPathInfo(id);
         if (typeof datum !== 'undefined') {
             path
-              .transition()
+              .transition('highlight')
                 .duration(500)
                 .style('fill', 'rgb(100,200,255)') // original blue
                 .style('opacity', scale(datum))
@@ -461,8 +474,7 @@ export class MapView extends View {
                 const top = view.yScale(datum.ID);
                 const coords = view.model.getCoordsByIndex(i);
 
-                paths
-                    .attr('class', 'map-bar');
+                paths.attr('class', 'map-bar');
 
                 if (transition) {
                     paths = paths
@@ -575,14 +587,8 @@ export class MapView extends View {
             .each(function(d, i) {
                 let paths = d3.select(this).selectAll('path'); // eslint-disable-line
                 const coords = view.model.getCoordsByIndex(i);
-                const features = [];
-                for (let j = 0; j < paths.size(); j++) {
-                    features.push(view.model.getSingleFeature(i, j));
-                }
 
-                paths
-                    .data(features)
-                    .attr('class', 'map-choro');
+                paths.attr('class', 'map-choro');
 
                 if (transition) {
                     paths = paths
