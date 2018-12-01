@@ -130,11 +130,11 @@ export class MagicView {
     viewify(selection) {
         // adds some extras to a D3 SVG selection
         selection.width = function() {
-            return this.node().clientWidth;
+            return this.node().getBoundingClientRect().width;
         };
 
         selection.height = function() {
-            return this.node().clientHeight;
+            return this.node().getBoundingClientRect().height;
         };
 
         selection.viewportTop = function() {

@@ -14,23 +14,23 @@
 
 .svg-scroll-point {
     opacity: 0.5;
-    width: 14px;
-    height: 14px;
+    /* width: 14px;
+    height: 14px; */
     fill: rgba(255, 255, 255, 1);
     stroke: white;
-    stroke-width: 6px;
+    /* stroke-width: 6px; */
 }
 
 .svg-scroll-point-mask-rect {
-    width: 20px;
-    height: 20px;
+    /* width: 20px;
+    height: 20px; */
 }
 
 #svg-scroll-line-dotted {
     fill: white;
 }
 
-@media screen and (min-width: 1921px) {
+/* @media screen and (min-width: 1921px) {
     
 }
 
@@ -68,7 +68,7 @@
         height: 30px;
         transform: translate(0, -1px);
     }
-}
+} */
 
 @media screen and (orientation: portrait) {
     #magic-container #scroll {

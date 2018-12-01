@@ -7,9 +7,49 @@ export class ScrollIndicator extends View {
         super(model, container, parent);
 
         this.points = points;
+
+        // because Firefox doesn't adhere to SVG2
+        this.mediaRules = {
+            landscape: [
+                {
+                    minWidth: 2561,
+                    containerWidth: 30,
+                    rectSize: 22,
+                    strokeWidth: 8,
+                    maskSize: 30
+                },
+                {
+                    minWidth: 0,
+                    containerWidth: 20,
+                    rectSize: 14,
+                    strokeWidth: 6,
+                    maskSize: 20
+                }
+            ],
+            portrait: [
+                {
+                    minWidth: 1025,
+                    containerWidth: 30,
+                    rectSize: 22,
+                    strokeWidth: 8,
+                    maskSize: 30
+                },
+                {
+                    minWidth: 0,
+                    containerWidth: 20,
+                    rectSize: 14,
+                    strokeWidth: 6,
+                    maskSize: 20
+                }
+            ]
+        };
     }
 
     init(callback) {
+        Object.keys(this.mediaRules).forEach((ori) => {
+            this.mediaRules[ori].sort((a, b) => b.minWidth - a.minWidth);
+        });
+
         this.buildDefs();
         this.buildRects();
     }
@@ -25,10 +65,10 @@ export class ScrollIndicator extends View {
 
         const pattern = this.container.select('#svg-scroll-line-pattern');
         const patternRect = pattern.select('rect');
-        const patternRectHeight = Math.round(patternRect.node().getBBox().width * 2);
+        const patternRectHeight = this.container.node().getBoundingClientRect().width;
 
-        pattern.attr('height', patternRectHeight * 1.5);
-        patternRect.attr('height', patternRectHeight);
+        pattern.attr('height', patternRectHeight);
+        patternRect.attr('height', patternRectHeight * 2 / 3);
 
         // add 3 for difference between mask and rect with stroke
         this.pointRects
@@ -39,9 +79,31 @@ export class ScrollIndicator extends View {
         this.pointMasks
             .attr('x', 0)
             .attr('y', this.pointY);
+
+        this.setSizes();
     }
 
     setHeight() {}
+
+    setSizes() {
+        const rules = this.mediaRules[this.orientation()].find((r) => {
+            return document.body.clientWidth >= r.minWidth;
+        });
+
+        this.container.style('width', `${rules.containerWidth}px`);
+
+        this.container
+          .selectAll('.svg-scroll-point')
+            .attr('width', rules.rectSize)
+            .attr('height', rules.rectSize)
+            .style('stroke-width', `${rules.strokeWidth}px`);
+
+        this.container
+          .select('#svg-scroll-point-mask')
+          .selectAll('.svg-scroll-point-mask-rect')
+            .attr('width', rules.maskSize)
+            .attr('height', rules.maskSize);
+    }
 
     pointY(d) {
         return typeof d.displayPoint === 'function' ? d.displayPoint() : d.displayPoint;
