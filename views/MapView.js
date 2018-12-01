@@ -201,8 +201,11 @@ export class MapView extends View {
                 const path = d3.select(document.elementFromPoint(...d3.touches(this)[0]));
                 if (!path.node() || path.node().tagName === 'svg') {
                     view.model.endHover();
-                } else {
+                } else if (view._state === 'hover') {
                     d3.event.preventDefault(); // prevent scrolling
+                    if (path.datum().id === view.highlightID) {
+                        view.unsetHighlight(view.highlightID, true);
+                    }
                     const hoverI = view.model.getFeatureIndexById(path.datum().id);
                     view.model.setHover(hoverI, d3.touches(this)[0], true);
                 }
