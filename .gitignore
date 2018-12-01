@@ -1,3 +1,4 @@
 .tags
 .vscode/
 node_modules/
+bundle.js
