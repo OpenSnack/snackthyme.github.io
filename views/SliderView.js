@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as noUiSlider from 'nouislider';
+import * as wNumb from 'wnumb';
 
 import {View} from './View.js';
 
@@ -59,12 +60,15 @@ export class SliderView extends View {
                 min: this.minimum,
                 max: this.maximum
             },
+            tooltips: wNumb({decimals: 0}),
             pips: {
                 mode: 'steps',
                 stepped: true,
                 density: 4
             }
         });
+
+        this.setEnabled(false);
 
         this.label = this.parent.container
           .append('span')
@@ -81,6 +85,12 @@ export class SliderView extends View {
         this.slider.on('end', () => {
             this.model.sliderEnded();
         });
+    }
+
+    setEnabled(enable) {
+        this.container
+            .attr('disabled', enable ? null : true)
+            .classed('slider-disabled', !enable);
     }
 
     update(params) {
@@ -117,8 +127,9 @@ export class SliderView extends View {
             .style('background-image', this.getConnectGradient());
 
         if (changed) {
+            this.setEnabled(this._state === 'focused');
+
             this.container
-                .attr('disabled', this._state !== 'focused' ? true : null)
                 .transition()
                 .duration(500)
                 .style('opacity', this._state !== 'focused' ? 0 : 1);

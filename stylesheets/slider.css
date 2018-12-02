@@ -6,6 +6,10 @@
     opacity: 0;
 }
 
+.slider-disabled {
+    pointer-events: none;
+}
+
 .noUi-target {
     background: rgba(255, 255, 255, 0.6);
     box-shadow: none;
@@ -31,8 +35,15 @@
 }
 
 .noUi-value {
+    display: none;
+}
+
+.noUi-tooltip {
+    top: 150%;
+    font-size: 2em;
+    background: none;
+    border: none;
     color: white;
-    top: 15px;
 }
 
 .noUi-marker.noUi-marker-horizontal {
@@ -58,8 +69,8 @@
         right: -28px;
     }
 
-    .noUi-value {
-        font-size: 1.5em;
+    .noUi-tooltip {
+        font-size: 2.5em;
     }
 }
 
@@ -74,8 +85,8 @@
         right: -35px;
     }
 
-    .noUi-value {
-        font-size: 2em;
+    .noUi-tooltip {
+        font-size: 3em;
     }
 }
 
@@ -90,7 +101,7 @@
         right: -35px;
     }
 
-    .noUi-value {
-        font-size: 2em;
+    .noUi-tooltip {
+        font-size: 3em;
     }
 }
