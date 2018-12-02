@@ -66,12 +66,12 @@ export class Model {
     }
 
     setSliderValue(value) {
-        this._sliderValue = value;
+        this._sliderValue = Number(value.toFixed(2));
         this.notify({trigger: 'sliderMoved', immediately: false});
     }
 
     setSliderValueImmediately(value) {
-        this._sliderValue = value;
+        this._sliderValue = Number(value.toFixed(2));
         this.notify({trigger: 'sliderMoved', immediately: true});
     }
 
