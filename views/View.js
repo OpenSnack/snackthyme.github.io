@@ -46,16 +46,17 @@ export class View extends Observer {
     setCaption(params, target) {
         target = target || this.caption;
 
-        function coordEval(coord) {
-            return typeof coord === 'function' ? coord() : coord;
+        function capEval(coord, param) {
+            return typeof coord === 'function' ? coord(param) : coord;
         }
 
         target
-            .style('width', coordEval(params.coords.width) * document.body.clientWidth + 'px')
-            .style('top', coordEval(params.coords.top) * document.body.clientHeight + 'px')
-            .style('left', coordEval(params.coords.left) * document.body.clientWidth + 'px')
+            .style('width', capEval(params.coords.width) * document.body.clientWidth + 'px')
+            .style('top', capEval(params.coords.top) * document.body.clientHeight + 'px')
+            .style('left', capEval(params.coords.left) * document.body.clientWidth + 'px')
             .style('text-align', params.align ? params.align : 'center')
-            .html(params.text);
+            .html(capEval(params.text, params.textValue));
+
 
         if (params.transition && !params.immediate) {
             target

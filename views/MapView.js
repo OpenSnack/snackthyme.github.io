@@ -114,7 +114,7 @@ export class MapView extends View {
 
         this._labelParams = {
             landscape: {
-                text: 'Rating change over time',
+                text: (value) => `Rating change over time, motivation = ${value}`,
                 coords: {
                     width: () => this.dims[this.orientation()]['focused'].width,
                     top: 0.95,
@@ -122,7 +122,7 @@ export class MapView extends View {
                 }
             },
             portrait: {
-                text: 'Rating change over time',
+                text: (value) => `Rating change over time, motivation = ${value}`,
                 coords: {
                     width: () => this.dims[this.orientation()]['focused'].width,
                     top: 0.85,
@@ -274,7 +274,8 @@ export class MapView extends View {
                 {}, this._labelParams[this.orientation()],
                 {
                     opacity: labelOpacity,
-                    transition: labelTransition
+                    transition: labelTransition,
+                    textValue: this.signedLabelValue(this.model.sliderValue())
                 }
             ),
             this.label
@@ -305,6 +306,11 @@ export class MapView extends View {
         } else if (trigger === 'resize' || trigger === 'barSelected') {
             this.draw(posParams);
         }
+    }
+
+    signedLabelValue(value) {
+        const sign = Math.sign(value) > 0 ? '+' : '';
+        return `${sign}${value * 100}`;
     }
 
     getPathInfo(id) {

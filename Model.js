@@ -136,6 +136,10 @@ export class Model {
         return rating + this._sliderValue * rating * ratio;
     }
 
+    sliderValue() {
+        return this._sliderValue;
+    }
+
     maxGrowth() {
         return this._maxGrowth;
     }
