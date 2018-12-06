@@ -338,20 +338,25 @@ export class MapView extends View {
 
         /* eslint-disable */
         path
-          .transition()
+          .transition('highlight')
             .duration(500)
             .on('start', function pulse() {
-                d3.active(this)
+                d3.active(this, 'highlight')
                     .style('fill', 'rgb(245, 113, 67)') // orange
                     .style('opacity', '1')
-                  .transition()
-                    .duration(500)
-                    .style('fill', 'rgb(100,200,255)') // original blue
-                    .style('opacity', scale(datum))
-                  .transition()
+                  .transition('highlight')
                     .duration(500)
                     .on('start', function() {
-                        if (Object.keys(this.__transition).length < 2) pulse.apply(this);
+                        if (Object.keys(this.__transition).length < 2) {
+                            d3.active(this, 'highlight')
+                                .style('fill', 'rgb(100,200,255)') // original blue
+                                .style('opacity', scale(datum))
+                              .transition('highlight')
+                                .duration(500)
+                                .on('start', function() {
+                                    if (Object.keys(this.__transition).length < 2) pulse.apply(this);
+                                });
+                        }
                     });
             });
         /* eslint-enable */
@@ -366,8 +371,8 @@ export class MapView extends View {
         }
 
         const {path, scale, datum} = this.getPathInfo(id);
-        if (typeof datum !== 'undefined') {
-            path
+        if (typeof datum !== 'undefined' && d3.active(path.node(), 'highlight')) {
+            d3.active(path.node(), 'highlight')
               .transition('highlight')
                 .duration(500)
                 .style('fill', 'rgb(100,200,255)') // original blue
