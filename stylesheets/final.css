@@ -14,8 +14,6 @@
 #final .caption {
     position: relative;
     margin-bottom: 50px;
-    user-select: none;
-    pointer-events: none;
 }
 
 #social-container {

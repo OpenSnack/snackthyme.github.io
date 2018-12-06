@@ -3,6 +3,8 @@ body {
     font-family: 'Work Sans', serif;
     font-weight: 200;
     overflow-anchor: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #background {
