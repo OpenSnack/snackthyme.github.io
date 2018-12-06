@@ -309,7 +309,7 @@ export class MapView extends View {
     }
 
     signedLabelValue(value) {
-        const sign = Math.sign(value) > 0 ? '+' : '';
+        const sign = Math.sign(value) >= 0 ? '+' : '';
         return `${sign}${value * 100}`;
     }
 
